@@ -22,6 +22,7 @@ SET (SOURCES
         ${SRC_DIR}/serverconnection.cpp
         ${SRC_DIR}/fileoperator.cpp
         ${SRC_DIR}/ftpserver.cpp
+        ${SRC_DIR}/OSApiFactory.cpp
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES})

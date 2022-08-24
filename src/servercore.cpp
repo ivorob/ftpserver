@@ -1,8 +1,11 @@
+#include <sys/socket.h>
+
 #include "servercore.h"
 #include "serverconnection.h"
+#include "OSApiFactory.h"
 
 servercore::servercore(uint port, std::string dir, unsigned short commandOffset) : dir(dir), commandOffset(commandOffset), shutdown(false), connId(0) {
-    if (chdir(dir.c_str()))
+    if (OSApi::chdir(dir.c_str()))
         std::cerr << "Directory could not be changed to '" << dir << "'!" << std::endl;
     this->initSockets(port);
     this->start();
@@ -11,7 +14,7 @@ servercore::servercore(uint port, std::string dir, unsigned short commandOffset)
 // Free up used memory by cleaning up all the object variables;
 servercore::~servercore() {
     std::cout << "Server shutdown" << std::endl;
-    close(this->s);
+    OSApi::close(this->s);
     this->freeAllConnections(); // Deletes all connection objects and frees their memory
 }
 
@@ -60,7 +63,7 @@ int servercore::handleNewConnection() {
     int fd; // Socket file descriptor for incoming connections
 
     this->cli_size = sizeof(this->cli);
-    fd = accept(this->s, (struct sockaddr*) &cli, &cli_size);
+    fd = OSApi::accept(this->s, (struct sockaddr*) &cli, &cli_size);
     if (fd < 0) {
         std::cerr << "Error while accepting client" << std::endl;
         return (EXIT_FAILURE);
@@ -73,7 +76,7 @@ int servercore::handleNewConnection() {
     if (fd == -1) {
         std::cerr << "Something went wrong, new connection could not be handled (Maybe server too busy, too many connections?)" << std::endl;
         try {
-            close(fd);
+            OSApi::close(fd);
         } catch (std::exception e) {
             std::cerr << e.what() << std::endl;
         }
@@ -130,7 +133,7 @@ int servercore::start() {
         this->buildSelectList(); // Clear out data handled in the previous iteration, clear closed sockets
 
         // Multiplexes between the existing connections regarding to data waiting to be processed on that connection (that's actually what select does)
-        readsocks = select(this->highSock+1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
+        readsocks = OSApi::select(this->highSock+1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
 
         if (readsocks < 0) {
             std::cerr << "Error calling select" << std::endl;
@@ -165,25 +168,25 @@ void servercore::initSockets(int port) {
     this->addr.sin_port = htons(port);
     this->addr.sin_addr.s_addr = INADDR_ANY; // Server can be connected to from any host
     // PF_INET: domain, Internet; SOCK_STREAM: datastream, TCP / SOCK_DGRAM = UDP => WARNING, this can change the byte order!; for 3rd parameter==0: TCP preferred
-    this->s = socket(PF_INET, SOCK_STREAM, 0);
+    this->s = OSApi::socket(PF_INET, SOCK_STREAM, 0);
     if (this->s == -1) {
         std::cerr << "socket() failed" << std::endl;
         return;
     }
     else if (setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied
         std::cerr << "setsockopt() failed" << std::endl;
-        close (this->s);
+        OSApi::close(this->s);
         return;
     }
     this->setNonBlocking(this->s);
-    if (bind(this->s, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
+    if (OSApi::bind(this->s, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
         std::cerr << ("bind() failed (do you have the apropriate rights? is the port unused?)") << std::endl;
-        close (this->s);
+        OSApi::close(this->s);
         return;
     } // 2nd parameter (backlog): number of connections in query, can be also set SOMAXCONN
-    else if (listen(this->s, this->maxConnectionsInQuery) == -1) {
+    else if (OSApi::listen(this->s, this->maxConnectionsInQuery) == -1) {
         std::cerr << ("listen () failed") << std::endl;
-        close (this->s);
+        OSApi::close(this->s);
         return;
     }
     this->highSock = this->s; // This is the first (and the main listening) socket

@@ -1,12 +1,11 @@
-#ifndef _SERVERCONNECTION_H
-#define	_SERVERCONNECTION_H
+#pragma once
+
 #include "fileoperator.h"
 #include <vector>
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <sys/fcntl.h>
-#include <sys/unistd.h>
 #include <algorithm> // for transform command
 
 // Separator for commands
@@ -45,5 +44,3 @@ private:
     unsigned short commandOffset;
     unsigned long receivedPart;
 };
-
-#endif	/* _SERVERCONNECTION_H */

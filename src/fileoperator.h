@@ -1,5 +1,4 @@
-#ifndef _FILEOPERATOR_H
-#define	_FILEOPERATOR_H
+#pragma once
 
 #include <iostream>
 #include <fstream>
@@ -16,7 +15,6 @@
 #include <pwd.h>
 #include <grp.h>
 #include <stdint.h>
-#include <unistd.h>
 
 // Buffer size
 #define BUFFER_SIZE 4096
@@ -71,5 +69,3 @@ private:
     std::list<std::string> completePath; // The path from server root dir upwards to the current working dir, each list element containing one dir
     static void IntToString(int i, std::string &res);
 };
-
-#endif	/* _FILEOPERATOR_H */

@@ -1,5 +1,4 @@
-#ifndef _SERVERCORE_H
-#define	_SERVERCORE_H
+#pragma once
 
 #include "serverconnection.h"
 #include <cstdio>
@@ -7,13 +6,11 @@
 #include <string>
 #include <iostream>
 #include <sstream>
-#include <sys/socket.h>
 #include <sys/types.h>
 #include <sys/fcntl.h>
 #include <sys/param.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 
 class servercore {
 public:
@@ -44,6 +41,3 @@ private:
     socklen_t cli_size;
     unsigned short commandOffset;
 };
-
-#endif	/* _SERVERCORE_H */
-

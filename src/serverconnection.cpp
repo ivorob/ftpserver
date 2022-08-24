@@ -1,12 +1,11 @@
-#include <sys/socket.h>
-
 #include "serverconnection.h"
+#include "OSApiFactory.h"
 
 // Destructor, clean up all the mess
 serverconnection::~serverconnection() {
     std::cout << "Connection terminated to client (connection id " << this->connectionId << ")" << std::endl;
     delete this->fo;
-    close(this->fd);
+    OSApi::close(this->fd);
     this->directories.clear();
     this->files.clear();
 }
@@ -233,7 +232,7 @@ std::vector<std::string> serverconnection::extractParameters(std::string command
 void serverconnection::respondToQuery() {
     char buffer[BUFFER_SIZE];
     int bytes;
-    bytes = recv(this->fd, buffer, sizeof(buffer), 0);
+    bytes = OSApi::recv(this->fd, buffer, sizeof(buffer), 0);
     // In non-blocking mode, bytes <= 0 does not mean a connection closure!
     if (bytes > 0) {
         std::string clientCommand = std::string(buffer, bytes);
@@ -267,7 +266,7 @@ void serverconnection::sendToClient(char* response, unsigned long length) {
     // Now we're sending the response
     unsigned int bytesSend = 0;
     while (bytesSend < length) {
-        int ret = send(this->fd, response+bytesSend, length-bytesSend, 0);
+        int ret = OSApi::send(this->fd, response+bytesSend, length-bytesSend, 0);
         if (ret <= 0) {
             return;
         }
@@ -280,7 +279,7 @@ void serverconnection::sendToClient(std::string response) {
     // Now we're sending the response
     unsigned int bytesSend = 0;
     while (bytesSend < response.length()) {
-        int ret = send(this->fd, response.c_str()+bytesSend, response.length()-bytesSend, 0);
+        int ret = OSApi::send(this->fd, response.c_str()+bytesSend, response.length()-bytesSend, 0);
         if (ret <= 0) {
             return;
         }
