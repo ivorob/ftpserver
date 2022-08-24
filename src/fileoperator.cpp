@@ -143,7 +143,7 @@ int fileoperator::writeFileBlock(std::string content) {
 }
 
 // File is closed when disconnecting
-int fileoperator::closeWriteFile() {
+void fileoperator::closeWriteFile() {
     if (this->currentOpenFile.is_open()) {
         std::cout << "Closing open file" << std::endl;
         this->currentOpenFile.close();

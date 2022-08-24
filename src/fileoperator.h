@@ -43,7 +43,7 @@ public:
     int writeFileAtOnce(std::string fileName, char* content);
     int beginWriteFile(std::string fileName);
     int writeFileBlock(std::string content);
-    int closeWriteFile();
+    void closeWriteFile();
     bool changeDir(std::string newPath, bool strict = true);
     std::string getCurrentWorkingDir(bool showRootPath = true);
     bool createFile(std::string &fileName, bool strict = true);
