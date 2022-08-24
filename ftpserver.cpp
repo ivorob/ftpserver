@@ -1,4 +1,7 @@
-#include "ftpserver.h"
+#include <cstdlib>
+#include <iostream>
+
+#include "servercore.h"
 
 /**
  * This is the main program entry point

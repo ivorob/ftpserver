@@ -1,5 +1,6 @@
+#include <sys/socket.h>
+
 #include "serverconnection.h"
-#include "ftpserver.h"
 
 // Destructor, clean up all the mess
 serverconnection::~serverconnection() {
@@ -27,7 +28,6 @@ bool serverconnection::commandEquals(std::string a, std::string b) {
 
 // Command switch for the issued client command, only called when this->command is set to 0
 std::string serverconnection::commandParser(std::string command) {
-    this->parameter;
     std::string res = "";
     this->uploadCommand = false;
     struct stat Status;
