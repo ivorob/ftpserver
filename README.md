@@ -1,6 +1,6 @@
 # Simple ftp server
 
-[![ftpserver](https://github.com/ivorob/scat/actions/workflows/cmake.yml/badge.svg)](https://github.com/ivorob/scat/actions)
+[![ftpserver](https://github.com/ivorob/ftpserver/actions/workflows/cmake.yml/badge.svg)](https://github.com/ivorob/ftpserver/actions)
 
 ## What is it and what does it do?
 
