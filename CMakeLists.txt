@@ -2,6 +2,7 @@ CMAKE_MINIMUM_REQUIRED (VERSION 3.0)
 PROJECT (ftpserver)
 
 SET (SRC_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
+SET (INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 OPTION (BUILD_TESTING "Build testing" OFF)
 
@@ -22,7 +23,17 @@ SET (SOURCES
         ${SRC_DIR}/serverconnection.cpp
         ${SRC_DIR}/fileoperator.cpp
         ${SRC_DIR}/ftpserver.cpp
-        ${SRC_DIR}/OSApiFactory.cpp
+        ${SRC_DIR}/OSApi.cpp
+        ${SRC_DIR}/OSApiImpl.cpp
     )
 
-ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES})
+SET (HEADERS
+        ${INCLUDE_DIR}/servercore.h
+        ${INCLUDE_DIR}/serverconnection.h
+        ${INCLUDE_DIR}/fileoperator.h
+        ${INCLUDE_DIR}/AbstractOSApi.h
+        ${INCLUDE_DIR}/OSApi.h
+        ${INCLUDE_DIR}/OSApiImpl.h
+    )
+
+ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})

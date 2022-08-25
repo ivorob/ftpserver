@@ -1,5 +1,5 @@
 #include "fileoperator.h"
-#include "OSApiFactory.h"
+#include "OSApi.h"
 
 // Constructor, gets the current server root dir as a parameter
 fileoperator::fileoperator(std::string dir) {
@@ -84,7 +84,7 @@ bool fileoperator::createDirectory(std::string &dirName, bool strict) {
     }
 
     umask(0);
-    return ((OSApi::mkdir(this->getCurrentWorkingDir().append(dirName).c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
+    return ((api()->mkdir(this->getCurrentWorkingDir().append(dirName).c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 // Read a block from the open file
@@ -245,7 +245,7 @@ bool fileoperator::deleteDirectory(std::string dirName, bool cancel, std::string
 
     // If there are no subdirectories and files (which should not be there anymore since we deleted them previously), delete the directory
     if ( (pathToDir.compare(".") != 0) && (pathToDir.compare("..") != 0) ) {
-        if ( OSApi::rmdir(this->getCurrentWorkingDir().append(pathToDir).c_str()) < 0 ) { // The actual delete command
+        if ( api()->rmdir(this->getCurrentWorkingDir().append(pathToDir).c_str()) < 0 ) { // The actual delete command
             std::cerr << "Failed deleting directory '" << this->getCurrentWorkingDir(false).append(pathToDir) << "'" << std::endl; // 0 == success, -1 == error (errno-> EACCES access denies, ENOENT path not found)
         } else {
             std::cout << "Directory '" << pathToDir << "' deleted" << std::endl;
@@ -431,8 +431,8 @@ void fileoperator::browse(std::string dir, std::vector<std::string> &directories
     struct dirent *dirp;
     if (this->dirCanBeOpenend(dir)) {
         try {
-            dp = OSApi::opendir(dir.c_str());
-            while ((dirp = OSApi::readdir(dp)) != NULL) {
+            dp = api()->opendir(dir.c_str());
+            while ((dirp = api()->readdir(dp)) != NULL) {
                 // Prohibit ../ only if the current working dir is already the server root directory
                 if (((std::string)dirp->d_name).compare("..") == 0 && this->completePath.size() < 2)
                     continue;
@@ -444,7 +444,7 @@ void fileoperator::browse(std::string dir, std::vector<std::string> &directories
                     files.push_back(std::string(dirp->d_name));
                 }
             }
-            OSApi::closedir(dp);
+            api()->closedir(dp);
         } catch (std::exception e) {
             std::cerr << "Error (" << e.what() << ") opening '" << dir << "'" << std::endl;
         }
@@ -457,8 +457,8 @@ void fileoperator::browse(std::string dir, std::vector<std::string> &directories
 bool fileoperator::dirCanBeOpenend(std::string dir) {
     DIR *dp;
     bool canBeOpened = false;
-    canBeOpened = ((dp = OSApi::opendir(dir.c_str())) != NULL); // Anything else than NULL is good
-    OSApi::closedir(dp);
+    canBeOpened = ((dp = api()->opendir(dir.c_str())) != NULL); // Anything else than NULL is good
+    api()->closedir(dp);
     return canBeOpened;
 }
 
