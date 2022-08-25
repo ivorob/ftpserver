@@ -9,9 +9,17 @@ It comes without any warranties of any kind.
 
 ## How to use?
 
-### Compile it
+### Building
 
-Compile it by using the `make all` command.
+To build run the following commands:
+
+```
+mkdir build
+cd build
+cmake -G "Unix Makefiles" ..
+cmake --build .
+```
+
 If all went well, an executable file named `ftpserver` should have been generated.
 
 ### Run the server
