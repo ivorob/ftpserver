@@ -8,6 +8,12 @@ int OSApiImpl::socket(int domain, int type, int protocol)
     return ::socket(domain, type, protocol);
 }
 
+int OSApiImpl::setsockopt(int s, int level, int optname, 
+    void* optval, socklen_t optlen)
+{
+    return ::setsockopt(s, level, optname, optval, optlen);
+}
+
 ssize_t OSApiImpl::recv(int s, void* buf, size_t len, int flags)
 {
     return ::recv(s, buf, len, flags);

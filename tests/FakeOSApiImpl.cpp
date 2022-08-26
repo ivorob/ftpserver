@@ -5,6 +5,12 @@ int DummyOSApi::socket(int, int, int)
     return 0;
 }
 
+int DummyOSApi::setsockopt(int s, int level, int optname, 
+    void* optval, socklen_t optlen)
+{
+    return -1;
+}
+
 ssize_t DummyOSApi::recv(int, void*, size_t, int)
 {
     return -1;

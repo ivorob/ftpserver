@@ -173,7 +173,7 @@ void servercore::initSockets(int port) {
         std::cerr << "socket() failed" << std::endl;
         return;
     }
-    else if (setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied
+    else if (api()->setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied
         std::cerr << "setsockopt() failed" << std::endl;
         api()->close(this->s);
         return;

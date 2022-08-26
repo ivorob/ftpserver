@@ -9,6 +9,8 @@ public:
     virtual ~AbstractOSApi() = default;
 
     virtual int socket(int domain, int type, int protocol) = 0;
+    virtual int setsockopt(int s, int level, int optname, 
+        void* optval, socklen_t optlen) = 0;
     virtual ssize_t recv(int s, void* buf, size_t len, int flags) = 0;
     virtual ssize_t send(int s, const void* msg, size_t len, int flags) = 0;
     virtual int bind(int s, const struct sockaddr* addr, socklen_t addrlen) = 0;
