@@ -9,6 +9,7 @@ SET (SOURCES
         ${SRC_DIR}/tests.cpp
         ${SRC_DIR}/ScopedStreamRedirector.cpp
         ${SRC_DIR}/FtpServerTest.cpp
+        ${SRC_DIR}/FileOperatorTest.cpp
         ${SRC_DIR}/FakeOSApi.cpp
         # main sources
         ${MAIN_SRC_DIR}/servercore.cpp

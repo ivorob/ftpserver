@@ -36,6 +36,7 @@ class fileoperator {
 public:
     fileoperator(std::string dir);
     virtual ~fileoperator();
+
     int readFile(std::string fileName);
     char* readFileBlock(unsigned long &sizeInBytes);
     int writeFileAtOnce(std::string fileName, char* content);
