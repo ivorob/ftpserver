@@ -2,7 +2,7 @@
 
 int DummyOSApi::socket(int, int, int)
 {
-    return 0;
+    return -1;
 }
 
 int DummyOSApi::setsockopt(int s, int level, int optname, 

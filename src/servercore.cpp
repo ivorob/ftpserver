@@ -171,6 +171,7 @@ void servercore::initSockets(int port) {
     this->s = api()->socket(PF_INET, SOCK_STREAM, 0);
     if (this->s == -1) {
         std::cerr << "socket() failed" << std::endl;
+        this->shutdown = true;
         return;
     }
     else if (api()->setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied

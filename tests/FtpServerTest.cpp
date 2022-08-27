@@ -5,7 +5,7 @@
 #include "FakeOSApi.h"
 #include "FakeOSApiImpl.h"
 
-TEST(FtpServerTest, error_during_server_start_prints_errors)
+TEST(FtpServerTest, error_allocating_socket_prints_errors)
 {
     setImpl(std::make_shared<DummyOSApi>());
     std::ostringstream out;
@@ -15,7 +15,6 @@ TEST(FtpServerTest, error_during_server_start_prints_errors)
 
     ASSERT_EQ(
         "Directory could not be changed to '/'!\n"
-        "setsockopt() failed\n"
-        "Error calling select\n",
+        "socket() failed\n",
         out.str());
 }
