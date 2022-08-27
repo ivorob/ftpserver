@@ -7,6 +7,13 @@
 
 namespace {
 
+class FtpServerTest : public ::testing::Test {
+public:
+    void TearDown() override {
+        setImpl({});
+    }
+};
+
 class MockOSApiImpl : public AbstractOSApi {
 public:
     MOCK_METHOD3(socket, int(int,int,int));
@@ -32,13 +39,12 @@ public:
 std::shared_ptr<MockOSApiImpl> makeImpl() {
     auto impl = std::make_shared<MockOSApiImpl>();
     setImpl(impl);
-    testing::Mock::AllowLeak(impl.get());
     return impl;
 }
 
 }
 
-TEST(FtpServerTest, error_during_changing_directory_prints_errors)
+TEST_F(FtpServerTest, error_during_changing_directory_prints_errors)
 {
     // Arrange
     std::ostringstream out;
@@ -61,7 +67,7 @@ TEST(FtpServerTest, error_during_changing_directory_prints_errors)
         out.str());
 }
 
-TEST(FtpServerTest, error_during_allocating_socket_shutdown_server)
+TEST_F(FtpServerTest, error_during_allocating_socket_shutdown_server)
 {
     // Arrange
     std::ostringstream out;
@@ -83,7 +89,7 @@ TEST(FtpServerTest, error_during_allocating_socket_shutdown_server)
         out.str());
 }
 
-TEST(FtpServerTest, error_during_setsockopt_shutdown_server)
+TEST_F(FtpServerTest, error_during_setsockopt_shutdown_server)
 {
     // Arrange
     std::ostringstream out;
