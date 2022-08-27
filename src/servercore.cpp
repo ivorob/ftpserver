@@ -14,7 +14,9 @@ servercore::servercore(uint port, std::string dir, unsigned short commandOffset)
 // Free up used memory by cleaning up all the object variables;
 servercore::~servercore() {
     std::cout << "Server shutdown" << std::endl;
-    api()->close(this->s);
+    if (this->s != -1) {
+        api()->close(this->s);
+    }
     this->freeAllConnections(); // Deletes all connection objects and frees their memory
 }
 
@@ -176,6 +178,7 @@ void servercore::initSockets(int port) {
     }
     else if (api()->setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied
         std::cerr << "setsockopt() failed" << std::endl;
+        this->shutdown = true;
         api()->close(this->s);
         return;
     }
