@@ -25,6 +25,8 @@ private:
     void readSockets();
     int handleNewConnection();
     void freeAllConnections();
+    void closeListenSocket();
+private:
     unsigned int maxConnectionsInQuery; // number of connections in query
     int s; // The main listening socket file descriptor
     int sflags; // Socket fd flags

@@ -14,10 +14,17 @@ servercore::servercore(uint port, std::string dir, unsigned short commandOffset)
 // Free up used memory by cleaning up all the object variables;
 servercore::~servercore() {
     std::cout << "Server shutdown" << std::endl;
+    closeListenSocket();
+    this->freeAllConnections(); // Deletes all connection objects and frees their memory
+}
+
+void servercore::closeListenSocket()
+{
+    this->shutdown = true;
     if (this->s != -1) {
         api()->close(this->s);
+        this->s = -1;
     }
-    this->freeAllConnections(); // Deletes all connection objects and frees their memory
 }
 
 // Builds the list of sockets to keep track on and removes the closed ones
@@ -178,19 +185,18 @@ void servercore::initSockets(int port) {
     }
     else if (api()->setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied
         std::cerr << "setsockopt() failed" << std::endl;
-        this->shutdown = true;
-        api()->close(this->s);
+        closeListenSocket();
         return;
     }
     this->setNonBlocking(this->s);
     if (api()->bind(this->s, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
         std::cerr << ("bind() failed (do you have the apropriate rights? is the port unused?)") << std::endl;
-        api()->close(this->s);
+        closeListenSocket();
         return;
     } // 2nd parameter (backlog): number of connections in query, can be also set SOMAXCONN
     else if (api()->listen(this->s, this->maxConnectionsInQuery) == -1) {
         std::cerr << ("listen () failed") << std::endl;
-        api()->close(this->s);
+        closeListenSocket();
         return;
     }
     this->highSock = this->s; // This is the first (and the main listening) socket
