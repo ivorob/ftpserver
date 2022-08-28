@@ -14,7 +14,7 @@ fileoperator::~fileoperator() {
 
 // Relative directories only, strict
 bool fileoperator::changeDir(std::string newPath, bool strict) {
-    if (strict) // When using strict mode, the function only allows one subdirectory and not several subdirectories, e.g. like sub/subsub/dir/ ...
+    if (strict) // When using strict mode, the function only allows one subdirectory and not several subdirectories, e.g. like sub/subsub/dir/ ... 
         getValidDir(newPath); // check error cases, e.g. newPath = '..//' , '/home/user/' , 'subdir' (without trailing slash), etc...
     // If change to a higher directory is requested
     if ( (newPath.compare("..") == 0) || (newPath.compare("../") == 0) ) {
@@ -455,11 +455,12 @@ void fileoperator::browse(std::string dir, std::vector<std::string> &directories
 
 // Returns true if dir can be opened
 bool fileoperator::dirCanBeOpenend(std::string dir) {
-    DIR *dp;
-    bool canBeOpened = false;
-    canBeOpened = ((dp = api()->opendir(dir.c_str())) != NULL); // Anything else than NULL is good
-    api()->closedir(dp);
-    return canBeOpened;
+    DIR *dp = api()->opendir(dir.c_str());
+    if (dp != nullptr) {
+        api()->closedir(dp);
+    }
+
+    return dp != nullptr;
 }
 
 // Clears out the list of deleted files
