@@ -104,7 +104,6 @@ std::string serverconnection::commandParser(std::string command) {
             std::cout << "Preparing download of file '" << this->parameter << "'" << std::endl;
             // all bytes (=parameters[2]) after the upload <file> command belong to the file
             res = this->fo->beginWriteFile(this->parameter);
-//            res = (this->fo->beginWriteFile(this->parameter) ? "Upload failed" : "Upload successful");
         } else
         if (this->commandEquals(commandAndParameter.at(0), "cd")) { // Changes the current working directory on the server
             std::cout << "Change of working dir to '" << this->parameter << "' requested" << std::endl;

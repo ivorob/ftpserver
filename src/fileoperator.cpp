@@ -143,7 +143,7 @@ int fileoperator::beginWriteFile(std::string fileName) {
 
 /// @WARNING, @KLUDGE: Concurrent file access not catched
 int fileoperator::writeFileBlock(std::string content) {
-    if(!this->currentOpenFile) {
+    if (!this->currentOpenFile.is_open()) {
         std::cerr << "Cannot write to output file" << std::endl;
         return (EXIT_FAILURE);
     }
