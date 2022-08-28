@@ -92,21 +92,10 @@ std::string serverconnection::commandParser(std::string command) {
             this->downloadCommand = true;
             std::cout << "Preparing download of file '" << this->parameter << "'" << std::endl;
             unsigned long lengthInBytes = 0;
-            char* fileBlock;
-            unsigned long readBytes = 0;
-            std::stringstream st;
-            if (!this->fo->readFile(this->parameter)) {
-                // Read the binary file block-wise
-//                do {
-                    st.clear();
-                    fileBlock = this->fo->readFileBlock(lengthInBytes);
-                    st << lengthInBytes;
-                    readBytes += lengthInBytes;
-//                    this->sendToClient(st.str()); // First, send length in bytes to client
-                    this->sendToClient(fileBlock,lengthInBytes); // This sends the binary char-array to the client
-//                    fileoperator* fn = new fileoperator(this->dir);
-//                    fn->writeFileAtOnce("./test.mp3",fileBlock);
-//                } while (lengthInBytes <= readBytes);
+            std::ifstream input = this->fo->readFile(this->parameter);
+            if (input) {
+                auto fileBlock = this->fo->readFileBlock(input, lengthInBytes);
+                this->sendToClient(fileBlock.get(), lengthInBytes); // This sends the binary char-array to the client
             }
             this->closureRequested = true; // Close connection after transfer
         } else

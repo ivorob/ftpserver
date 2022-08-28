@@ -6,6 +6,7 @@
 #include <cstdlib>
 #include <vector>
 #include <sstream>
+#include <memory>
 #include <list>
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -37,8 +38,8 @@ public:
     fileoperator(std::string dir);
     virtual ~fileoperator();
 
-    int readFile(std::string fileName);
-    char* readFileBlock(unsigned long &sizeInBytes);
+    std::ifstream readFile(std::string fileName);
+    std::unique_ptr<char[]>  readFileBlock(std::ifstream& input, unsigned long &sizeInBytes);
     int writeFileAtOnce(std::string fileName, char* content);
     int beginWriteFile(std::string fileName);
     int writeFileBlock(std::string content);
@@ -66,7 +67,6 @@ private:
     void getValidFile(std::string &fileName);
     void stripServerRootString(std::string &dirOrFileName);
     std::ofstream currentOpenFile;
-    std::ifstream currentOpenReadFile;
     std::list<std::string> completePath; // The path from server root dir upwards to the current working dir, each list element containing one dir
     static void IntToString(int i, std::string &res);
 };

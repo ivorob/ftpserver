@@ -88,37 +88,46 @@ bool fileoperator::createDirectory(std::string &dirName, bool strict) {
 }
 
 // Read a block from the open file
-char* fileoperator::readFileBlock(unsigned long &sizeInBytes) {
+std::unique_ptr<char[]> fileoperator::readFileBlock(std::ifstream& input, unsigned long &sizeInBytes) {
+    if (!input) {
+        return {};
+    }
+
     // get length of file
-    this->currentOpenReadFile.seekg(0, std::ios::end);
-    std::ifstream::pos_type size = this->currentOpenReadFile.tellg();
+    input.seekg(0, std::ios::end);
+    std::ifstream::pos_type size = input.tellg();
     sizeInBytes = (unsigned long)size;
+    if (size == 0) {
+        std::cout << "Try to read empty file!" << std::endl;
+        return {};
+    }
 
-    this->currentOpenReadFile.seekg (0, std::ios::beg);
+    input.seekg(0, std::ios::beg);
     // allocate memory
-    char* memblock = new char [size];
+    std::unique_ptr<char[]> memblock(new char[size]);
     // read data as a block
-    this->currentOpenReadFile.read (memblock,size);
+    input.read(memblock.get(), size);
 
-    // delete[] memblock;
     std::cout << "Reading " << size << " Bytes" << std::endl;
-    this->currentOpenReadFile.close();
     return memblock;
 }
 
 /// @WARNING, @KLUDGE: Concurrent file access not catched
-int fileoperator::readFile(std::string fileName) {
+std::ifstream fileoperator::readFile(std::string fileName) {
     stripServerRootString(fileName);
-    this->currentOpenReadFile.open(fileName.c_str(), std::ios::in|std::ios::binary); // modes for binary file  |std::ios::ate
-    if (this->currentOpenReadFile.fail()) {
+
+    std::ifstream input(fileName, std::ios::in | std::ios::binary); // modes for binary file  |std::ios::ate
+    if (input.fail()) {
         std::cout << "Reading file '" << fileName << "' failed!" << std::endl; //  strerror(errno) <<
-        return (EXIT_FAILURE);
+        return input;
     }
-    if (this->currentOpenReadFile.is_open()) {
-        return (EXIT_SUCCESS);
+
+    if (input.is_open()) {
+        return input;
     }
+
     std::cerr << "Unable to open file '" << fileName << " '" << std::endl; // << strerror(errno)
-    return (EXIT_FAILURE);
+    return input;
 }
 
 int fileoperator::beginWriteFile(std::string fileName) {
