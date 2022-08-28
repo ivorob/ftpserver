@@ -9,7 +9,19 @@
 
 namespace fs = std::filesystem;
 
-TEST(ReadFileTest, cannot_open_not_existing_file)
+namespace {
+
+class ReadFileTest : public ::testing::Test {
+public:
+    void SetUp() override {
+        std::error_code errorCode;
+        fs::remove("invalidFile", errorCode);
+    }
+};
+
+}
+
+TEST_F(ReadFileTest, cannot_open_not_existing_file)
 {
     // Arrange
     fileoperator fileOperator("/");
@@ -26,7 +38,7 @@ TEST(ReadFileTest, cannot_open_not_existing_file)
         out.str());
 }
 
-TEST(ReadFileTest, existing_file_is_open_successfully)
+TEST_F(ReadFileTest, existing_file_is_open_successfully)
 {
     // Arrange
     fileoperator fileOperator("/");
@@ -41,7 +53,7 @@ TEST(ReadFileTest, existing_file_is_open_successfully)
     ASSERT_TRUE(input);
 }
 
-TEST(ReadFileTest, cannot_read_data_from_empty_file)
+TEST_F(ReadFileTest, cannot_read_data_from_empty_file)
 {
     // Arrange
     fileoperator fileOperator("/");
@@ -66,7 +78,7 @@ TEST(ReadFileTest, cannot_read_data_from_empty_file)
         out.str());
 }
 
-TEST(ReadFileTest, read_block_operation_provides_full_file_content)
+TEST_F(ReadFileTest, read_block_operation_provides_full_file_content)
 {
     // Arrange
     fileoperator fileOperator("/");
