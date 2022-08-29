@@ -13,6 +13,7 @@ SET (SOURCES
         ${SRC_DIR}/CreateDirectoryTest.cpp
         ${SRC_DIR}/ReadFileTest.cpp
         ${SRC_DIR}/AppendFileTest.cpp
+        ${SRC_DIR}/DeleteFileTest.cpp
         ${SRC_DIR}/FakeOSApi.cpp
         # main sources
         ${MAIN_SRC_DIR}/servercore.cpp
