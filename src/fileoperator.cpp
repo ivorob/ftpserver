@@ -446,7 +446,7 @@ void fileoperator::browse(std::string dir, std::vector<std::string> &directories
             std::cerr << "Error (" << e.what() << ") opening '" << dir << "'" << std::endl;
         }
     } else {
-        std::cout << "Error: Directory '" << dir << "' could not be opened!" << std::endl;
+        std::cerr << "Error: Directory '" << dir << "' could not be opened!" << std::endl;
     }
 }
 
