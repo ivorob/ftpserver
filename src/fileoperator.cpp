@@ -160,18 +160,6 @@ void fileoperator::closeWriteFile() {
     }
 }
 
-int fileoperator::writeFileAtOnce(std::string fileName, char* content) {
-    stripServerRootString(fileName);
-    std::ofstream myFile(fileName.c_str(), std::ios::out|std::ios::binary); // output file |std::ios::app
-    if(!myFile) {
-        std::cerr << "Cannot open output file '" << fileName << "'" << std::endl;
-        return (EXIT_FAILURE);
-    }
-    myFile << content;
-    myFile.close();
-    return (EXIT_SUCCESS);
-}
-
 // Same as unix touch command
 // Avoid touch ../file beyond server root!
 bool fileoperator::createFile(std::string &fileName, bool strict) {

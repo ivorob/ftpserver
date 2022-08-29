@@ -40,7 +40,6 @@ public:
 
     std::ifstream readFile(std::string fileName);
     std::unique_ptr<char[]>  readFileBlock(std::ifstream& input, unsigned long &sizeInBytes);
-    int writeFileAtOnce(std::string fileName, char* content);
     int beginWriteFile(std::string fileName);
     int writeFileBlock(std::string content);
     void closeWriteFile();
