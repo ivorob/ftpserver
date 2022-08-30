@@ -36,7 +36,7 @@ private:
     bool downloadCommand;
     std::string parameter;
     fileoperator* fo; // For browsing, writing and reading
-    void sendToClient(char* response, unsigned long length);
+    void sendToClient(const char* response, unsigned long length);
     void sendToClient(std::string response);
     bool commandEquals(std::string a, std::string b);
     std::string filterOutBlanks(std::string inString);

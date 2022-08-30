@@ -13,6 +13,9 @@ serverconnection::~serverconnection() {
 // Constructor
 serverconnection::serverconnection(int filedescriptor, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) : fd(filedescriptor), connectionId(connId), dir(defaultDir), hostAddress(hostId), commandOffset(commandOffset), closureRequested(false), uploadCommand(false), downloadCommand(false),  receivedPart(0), parameter("") {
 //    this->files = std::vector<std::string>();
+    // Send hello
+    std::string data = "220 [hostname] FTP server ready.\n"; //TODO: add hostname
+    sendToClient(data.c_str(), data.size());
     this->fo = new fileoperator(this->dir); // File and directory browser
     std::cout << "Connection to client '" << this->hostAddress << "' established" << std::endl;
 }
@@ -250,7 +253,7 @@ void serverconnection::respondToQuery() {
 }
 
 // Sends the given string to the client using the current connection
-void serverconnection::sendToClient(char* response, unsigned long length) {
+void serverconnection::sendToClient(const char* response, unsigned long length) {
     // Now we're sending the response
     unsigned int bytesSend = 0;
     while (bytesSend < length) {
