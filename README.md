@@ -40,12 +40,13 @@ Available commands in the program that the client can issue and the running ftps
 
 | Command | Explanation |
 | --- | --- |
+| user `username` | login as user `username`, dummy implemented |
 | browse | lists all files and directories in the current server working directory |
 | ls `dir` | lists all files and directories in the specified directory |
 | download `file` | sends the binary data of the specified file over the connection the command was received |
 | upload `file` | stores all binary data that is received by the connection the command was received |
 | pwd | prints the current working directory on the server |
-| cd `dir` | changes the current working directory on the server to the specified one |
+| cwd `dir` | changes the current working directory on the server to the specified one |
 | touch `file` | create an empty file of the given name |
 | mkdir `dir` | creates a directory of the specified name in the current server working dir |
 | rmdir `dir` | removes the specified directory and all contents at the server side |
@@ -60,8 +61,9 @@ Available commands in the program that the client can issue and the running ftps
 | bye | terminates the connection the command is received on |
 | quit | same as disconnect |
 
-## To-do
+## TODO
 
-* Align to standard FTP *SERVER* commands, see http://www.nsftools.com/tips/RawFTP.htm and http://www.ipswitch.com/support/ws_ftp-server/guide/v5/A_FTPref3.html
-* Refactor the code to get rid of warnings
+* Align to standard FTP *SERVER* commands, see http://www.nsftools.com/tips/RawFTP.htm and https://www.rfc-editor.org/rfc/rfc959
 * Refactor the code to align to new C++ versions and standards
+* Refactor the code to make standard ftp clients work
+* Refactor the code to add Windows support

@@ -18,6 +18,7 @@ SET (SOURCES
         ${SRC_DIR}/DeleteDirectoryTest.cpp
         ${SRC_DIR}/FakeOSApi.cpp
         ${SRC_DIR}/BrowseUtils.cpp
+        ${SRC_DIR}/ServerConnectionTest.cpp
         # main sources
         ${MAIN_SRC_DIR}/servercore.cpp
         ${MAIN_SRC_DIR}/serverconnection.cpp

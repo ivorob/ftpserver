@@ -17,7 +17,6 @@ public:
     std::string commandParser(std::string command);
     std::vector<std::string> extractParameters(std::string command);
     virtual ~serverconnection();
-    void run();
     void respondToQuery();
     int getFD();
     bool getCloseRequestStatus();

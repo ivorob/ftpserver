@@ -105,7 +105,9 @@ int servercore::handleNewConnection() {
         hostId = (std::string)ipstr;
     }
 
-    printf("Connection accepted: FD=%d - Slot=%lu - Id=%d \n", fd, (this->connections.size()+1), ++(this->connId));
+    std::cout << "Connection accepted: FD=" << fd 
+              << " - Slot=" << (this->connections.size() + 1) 
+              << (++this->connId) << std::endl;
     // The new connection (object)
     serverconnection* conn = new serverconnection(fd, this->connId, this->dir, hostId, this->commandOffset); // The connection vector
     // Add it to our list for better management / convenience
