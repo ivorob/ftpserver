@@ -4,6 +4,7 @@
 #include "FakeOSApi.h"
 #include "MockOSApiImpl.h"
 #include "ScopedStreamRedirector.h"
+#include "BrowseUtils.h"
 
 namespace {
 
@@ -20,32 +21,14 @@ std::shared_ptr<MockOSApiImpl> makeImpl() {
     return impl;
 }
 
-struct dirent makeDirEntry(const std::string& name, uint8_t type)
-{
-    struct dirent dirEntry = {0};
-#if defined(__APPLE_CC__)
-    dirEntry.d_ino = 0;
-#else
-    dirEntry.d_fileno = 0;
-    dirEntry.d_off = 0;
-#endif
-    dirEntry.d_reclen = sizeof(struct dirent);
-    dirEntry.d_type = type;
-#if defined(__FreeBSD__) || defined(__APPLE_CC__)
-    dirEntry.d_namlen = name.size();
-#endif
-    strncpy(dirEntry.d_name, name.c_str(), sizeof(dirEntry.d_name));
-    return dirEntry;
-}
-
 std::vector<struct dirent> makeDirEntries() {
     std::vector<struct dirent> dirEntries;
-    dirEntries.push_back(makeDirEntry(".", DT_DIR));
-    dirEntries.push_back(makeDirEntry("..", DT_DIR));
-    dirEntries.push_back(makeDirEntry("test", DT_DIR));
-    dirEntries.push_back(makeDirEntry("file1", DT_REG));
-    dirEntries.push_back(makeDirEntry("file2", DT_REG));
-    dirEntries.push_back(makeDirEntry("file3", DT_REG));
+    dirEntries.push_back(BrowseUtils::makeDirEntry(".", DT_DIR));
+    dirEntries.push_back(BrowseUtils::makeDirEntry("..", DT_DIR));
+    dirEntries.push_back(BrowseUtils::makeDirEntry("test", DT_DIR));
+    dirEntries.push_back(BrowseUtils::makeDirEntry("file1", DT_REG));
+    dirEntries.push_back(BrowseUtils::makeDirEntry("file2", DT_REG));
+    dirEntries.push_back(BrowseUtils::makeDirEntry("file3", DT_REG));
     return dirEntries;
 }
 

@@ -15,7 +15,9 @@ SET (SOURCES
         ${SRC_DIR}/AppendFileTest.cpp
         ${SRC_DIR}/DeleteFileTest.cpp
         ${SRC_DIR}/BrowseDirectoryTest.cpp
+        ${SRC_DIR}/DeleteDirectoryTest.cpp
         ${SRC_DIR}/FakeOSApi.cpp
+        ${SRC_DIR}/BrowseUtils.cpp
         # main sources
         ${MAIN_SRC_DIR}/servercore.cpp
         ${MAIN_SRC_DIR}/serverconnection.cpp
@@ -25,6 +27,7 @@ SET (SOURCES
 SET (HEADERS
         ${INCLUDE_DIR}/ScopedStreamRedirector.h
         ${INCLUDE_DIR}/FakeOSApi.h
+        ${INCLUDE_DIR}/BrowseUtils.h
         # main includes
         ${MAIN_INCLUDE_DIR}/servercore.h
         ${MAIN_INCLUDE_DIR}/serverconnection.h
