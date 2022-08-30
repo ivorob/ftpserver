@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include "BrowseUtils.h"
 
 struct dirent BrowseUtils::makeDirEntry(const std::string& name, uint8_t type)
