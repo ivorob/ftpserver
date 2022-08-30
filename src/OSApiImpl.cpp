@@ -1,5 +1,6 @@
 #include <unistd.h>
 #include <sys/stat.h>
+#include <stdio.h>
 
 #include "OSApiImpl.h"
 
@@ -43,6 +44,11 @@ int OSApiImpl::select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* excep
 int OSApiImpl::accept(int s, struct sockaddr* addr, socklen_t* addrlen)
 {
     return ::accept(s, addr, addrlen);
+}
+
+int OSApiImpl::remove(const char* path)
+{
+    return ::remove(path);
 }
 
 int OSApiImpl::close(int fd)

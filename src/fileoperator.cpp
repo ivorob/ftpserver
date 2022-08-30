@@ -185,7 +185,7 @@ bool fileoperator::createFile(std::string &fileName, bool strict) {
 bool fileoperator::deleteFile(std::string fileName, bool strict) {
     if (strict)
         this->getValidFile(fileName); // Avoid rm ../file beyond server root!
-    if (remove(this->getCurrentWorkingDir().append(fileName).c_str()) != 0 ) {
+    if (api()->remove(this->getCurrentWorkingDir().append(fileName).c_str()) != 0 ) {
         std::cerr << "Error deleting file '" << fileName << "'" << std::endl;
         return (EXIT_FAILURE);
     } else {

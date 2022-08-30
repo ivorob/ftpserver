@@ -14,6 +14,7 @@ public:
     MOCK_METHOD2(listen, int(int, int));
     MOCK_METHOD5(select, int(int, fd_set*, fd_set*, fd_set*, struct timeval*));
     MOCK_METHOD3(accept, int(int, struct sockaddr*, socklen_t*));
+    MOCK_METHOD1(remove, int(const char*));
 
     MOCK_METHOD1(close, int(int));
     MOCK_METHOD1(rmdir, int(const char*));

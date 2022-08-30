@@ -2,14 +2,39 @@
 
 #include "fileoperator.h"
 #include "ScopedStreamRedirector.h"
+#include "FakeOSApi.h"
+#include "MockOSApiImpl.h"
 
-TEST(DeleteFileTest, cannot_delete_file_with_invalid_name)
+namespace {
+
+class DeleteFileTest : public ::testing::Test {
+public:
+    void TearDown() override {
+        setImpl({});
+    }
+};
+
+std::shared_ptr<MockOSApiImpl> makeImpl() {
+    auto impl = std::make_shared<MockOSApiImpl>();
+    setImpl(impl);
+    return impl;
+}
+
+}
+
+TEST_F(DeleteFileTest, cannot_delete_file_with_invalid_name)
 {
     // Arrange
     fileoperator fileOperator("/");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cerr, out);
+
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+    EXPECT_CALL(*impl, remove)
+        .WillRepeatedly(Return(-1));
 
     // Act
     int actualResult = fileOperator.deleteFile("");
@@ -21,13 +46,19 @@ TEST(DeleteFileTest, cannot_delete_file_with_invalid_name)
         out.str());
 }
 
-TEST(DeleteFileTest, cannot_delete_not_existing_file)
+TEST_F(DeleteFileTest, cannot_delete_not_existing_file)
 {
     // Arrange
     fileoperator fileOperator("/");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cerr, out);
+
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+    EXPECT_CALL(*impl, remove)
+        .WillRepeatedly(Return(-1));
 
     // Act
     int actualResult = fileOperator.deleteFile("invalidFile");
@@ -39,7 +70,7 @@ TEST(DeleteFileTest, cannot_delete_not_existing_file)
         out.str());
 }
 
-TEST(DeleteFileTest, file_is_deleted_successfully)
+TEST_F(DeleteFileTest, file_is_deleted_successfully)
 {
     // Arrange
     fileoperator fileOperator("/");
@@ -47,7 +78,11 @@ TEST(DeleteFileTest, file_is_deleted_successfully)
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
 
-    std::ofstream emptyFile("emptyFile");
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+    EXPECT_CALL(*impl, remove)
+        .WillRepeatedly(Return(0));
 
     // Act
     int actualResult = fileOperator.deleteFile("emptyFile");

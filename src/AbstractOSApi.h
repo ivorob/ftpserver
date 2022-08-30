@@ -18,6 +18,7 @@ public:
     virtual int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
         struct timeval* timeout) = 0;
     virtual int accept(int s, struct sockaddr* addr, socklen_t* addrlen) = 0;
+    virtual int remove(const char *path) = 0;
 
     virtual int close(int fd) = 0;
     virtual int rmdir(const char* path) = 0;
