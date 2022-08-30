@@ -124,8 +124,9 @@ TEST_F(DeleteDirectoryTest, unavailability_to_delete_file_inside_directory_cance
     // Arrange
     fileoperator fileOperator("/");
 
-    std::ostringstream out;
+    std::ostringstream out, errorOut;
     ScopedStreamRedirector streamRedirector(std::cout, out);
+    ScopedStreamRedirector errorStreamDirectory(std::cerr, errorOut);
 
     using ::testing::Return;
 
@@ -176,4 +177,8 @@ TEST_F(DeleteDirectoryTest, unavailability_to_delete_file_inside_directory_cance
         "File './test/file1' deleted\n"
         "File './test/file3' deleted\n",
         out.str());
+    ASSERT_EQ(
+        "Error deleting file './test/file2'\n"
+        "Failed deleting directory '<root>/./test/'\n",
+        errorOut.str());
 }

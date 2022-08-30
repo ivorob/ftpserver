@@ -210,39 +210,34 @@ bool fileoperator::deleteDirectory(std::string dirName, bool cancel, std::string
     }
     getValidDir(dirName);
 
-    std::vector<std::string>* directories = new std::vector<std::string>();
-    std::vector<std::string>::iterator dirIterator;
-    std::vector<std::string>* files = new std::vector<std::string>();
-    std::vector<std::string>::iterator fileIterator;
-    
     pathToDir.append(dirName);
 
-// std::cout << "Browse " << pathToDir << std::endl;
-    this->browse(pathToDir,*directories,*files,false);
+    std::vector<std::string> directories;
+    std::vector<std::string> files;
+    this->browse(pathToDir, directories, files, false);
 
     // Now walk over all files in the current directory and delete them
-    fileIterator = files->begin();
-    while(fileIterator != files->end() ) {
-// std::cout << "Removing file " << pathToDir + (*fileIterator) << std::endl;
+    auto fileIterator = files.begin();
+    while (fileIterator != files.end() ) {
         cancel = (this->deleteFile(pathToDir + (*fileIterator++), false) || cancel);
     }
 
     // Now delete all subdirectories in the current directory
-    dirIterator = directories->begin();
-    while( dirIterator != directories->end() ) {
+    auto dirIterator = directories.begin();
+    while (dirIterator != directories.end()) {
         // If not ./ and ../
-        if ( ((*(dirIterator)).compare(".") == 0) || ((*(dirIterator)).compare("..") == 0) ) {
-            dirIterator++;
+        if (((*(dirIterator)).compare(".") == 0) || ((*(dirIterator)).compare("..") == 0)) {
+            ++dirIterator;
             continue;
         }
-// std::cout << "Recursive Call rmdir("<< (*dirIterator).append("/") << "," << pathToDir << ")" << std::endl;
+
         // Only one error must occur and the cancel becomes true and aborts the deletions
         cancel = (this->deleteDirectory((*(dirIterator++)).append("/"), cancel, pathToDir) || cancel);
     }
 
     // If there are no subdirectories and files (which should not be there anymore since we deleted them previously), delete the directory
     if ( (pathToDir.compare(".") != 0) && (pathToDir.compare("..") != 0) ) {
-        if ( api()->rmdir(this->getCurrentWorkingDir().append(pathToDir).c_str()) < 0 ) { // The actual delete command
+        if (api()->rmdir(this->getCurrentWorkingDir().append(pathToDir).c_str()) < 0) { // The actual delete command
             std::cerr << "Failed deleting directory '" << this->getCurrentWorkingDir(false).append(pathToDir) << "'" << std::endl; // 0 == success, -1 == error (errno-> EACCES access denies, ENOENT path not found)
         } else {
             std::cout << "Directory '" << pathToDir << "' deleted" << std::endl;
