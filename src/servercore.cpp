@@ -40,7 +40,7 @@ void servercore::buildSelectList() {
     // Iterates over all the possible connections and adds those sockets to the fd_set and erases closed ones
     std::vector<serverconnection*>::iterator iter = this->connections.begin();
     while( iter != this->connections.end() ) {
-        if ((*iter)->getCloseRequestStatus() == true) { // This connection was closed, flag is set -> remove its corresponding object and free the memory
+        if ((*iter)->getCloseRequestStatus()) { // This connection was closed, flag is set -> remove its corresponding object and free the memory
             std::cout << "Connection with Id " << (*iter)->getConnectionId() << " closed! " << std::endl;
             delete (*iter); // Clean up
             this->connections.erase(iter); // Delete it from our vector

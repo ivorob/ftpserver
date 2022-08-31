@@ -6,6 +6,7 @@
 #include "FakeOSApi.h"
 #include "MockOSApiImpl.h"
 #include "ScopedStreamRedirector.h"
+#include "BrowseUtils.h"
 
 namespace fs = std::filesystem;
 
@@ -22,6 +23,16 @@ std::shared_ptr<MockOSApiImpl> makeImpl() {
     auto impl = std::make_shared<MockOSApiImpl>();
     setImpl(impl);
     return impl;
+}
+
+std::vector<struct dirent> makeTestDir() {
+    std::vector<struct dirent> testDir;
+    testDir.push_back(BrowseUtils::makeDirEntry(".", DT_DIR));
+    testDir.push_back(BrowseUtils::makeDirEntry("..", DT_DIR));
+    testDir.push_back(BrowseUtils::makeDirEntry("testDir", DT_DIR));
+    testDir.push_back(BrowseUtils::makeDirEntry("file1", DT_REG));
+    testDir.push_back(BrowseUtils::makeDirEntry("file2", DT_REG));
+    return testDir;
 }
 
 }
@@ -227,4 +238,162 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
         "Connection 1: Change of working dir to 'tests' requested\n"
         "Directory change to 'tests' successful!\n",
         out.str());
+}
+
+TEST_F(ServerConnectionTest, list_current_directory_command_is_processed_successfully)
+{
+    // Arrange
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+
+    EXPECT_CALL(*impl, recv)
+        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+            std::string command = "LIST\n";
+            strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
+            return static_cast<int>(command.size());
+        });
+    std::string response;
+    EXPECT_CALL(*impl, send)
+        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+            if (msg == nullptr) {
+                return -1;
+            }
+
+            response.assign(reinterpret_cast<const char*>(msg), len);
+            return 0;
+        });
+    EXPECT_CALL(*impl, close)
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, opendir)
+        .WillRepeatedly(Return(reinterpret_cast<DIR*>(0x12345678)));
+    EXPECT_CALL(*impl, closedir)
+        .WillRepeatedly(Return(0));
+    auto testDir = makeTestDir();
+    size_t i = 0;
+    EXPECT_CALL(*impl, readdir)
+        .WillRepeatedly([&testDir, &i](DIR*) -> struct dirent* {
+            if (i < testDir.size()) {
+                return &testDir[i++];
+            }
+
+            return nullptr;
+        });
+
+    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+
+    std::ostringstream out;
+    ScopedStreamRedirector streamRedirector(std::cout, out);
+
+    // Act
+    serverConnection.respondToQuery();
+
+    // Assert
+    ASSERT_EQ(
+        "./\n"
+        "testDir/\n"
+        "file1\n"
+        "file2\n"
+        "\n",
+        response);
+    ASSERT_EQ(
+        "Connection 1: Browsing files of the current working dir\n"
+        "Browsing ''\n",
+        out.str());
+}
+
+TEST_F(ServerConnectionTest, bye_command_is_processed_successfully)
+{
+    // Arrange
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+
+    EXPECT_CALL(*impl, close)
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, recv)
+        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+            std::string command = "BYE\n";
+            strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
+            return static_cast<int>(command.size());
+        });
+    std::string response;
+    EXPECT_CALL(*impl, send)
+        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+            response.clear();
+            if (msg == nullptr || len == 0) {
+                return -1;
+            }
+
+            response.assign(reinterpret_cast<const char*>(msg), len);
+            return 0;
+        });
+
+    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+
+    std::ostringstream out;
+    ScopedStreamRedirector streamRedirector(std::cout, out);
+
+    bool closeStatusBeforeProcessCommand = serverConnection.getCloseRequestStatus();
+
+    // Act
+    serverConnection.respondToQuery();
+
+    // Assert
+    ASSERT_EQ(
+        "221 Goodbye.\n",
+        response);
+    ASSERT_EQ(
+        "Connection 1: Shutdown of connection requested\n",
+        out.str());
+    ASSERT_FALSE(closeStatusBeforeProcessCommand);
+    ASSERT_TRUE(serverConnection.getCloseRequestStatus());
+}
+
+TEST_F(ServerConnectionTest, quit_command_is_processed_successfully)
+{
+    // Arrange
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+
+    EXPECT_CALL(*impl, close)
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, recv)
+        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+            std::string command = "QUIT\n";
+            strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
+            return static_cast<int>(command.size());
+        });
+    std::string response;
+    EXPECT_CALL(*impl, send)
+        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+            response.clear();
+            if (msg == nullptr || len == 0) {
+                return -1;
+            }
+
+            response.assign(reinterpret_cast<const char*>(msg), len);
+            return 0;
+        });
+
+    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+
+    std::ostringstream out;
+    ScopedStreamRedirector streamRedirector(std::cout, out);
+
+    bool closeStatusBeforeProcessCommand = serverConnection.getCloseRequestStatus();
+
+    // Act
+    serverConnection.respondToQuery();
+
+    // Assert
+    ASSERT_EQ(
+        "221 Goodbye.\n",
+        response);
+    ASSERT_EQ(
+        "Connection 1: Shutdown of connection requested\n",
+        out.str());
+    ASSERT_FALSE(closeStatusBeforeProcessCommand);
+    ASSERT_TRUE(serverConnection.getCloseRequestStatus());
 }

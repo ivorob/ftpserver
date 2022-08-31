@@ -30,7 +30,7 @@ bool serverconnection::commandEquals(std::string a, std::string b) {
 
 // Command switch for the issued client command, only called when this->command is set to 0
 std::string serverconnection::commandParser(std::string command) {
-    std::string res = "";
+    std::string res;
     this->uploadCommand = false;
     struct stat Status;
     // Commands can have either 0 or 1 parameters, e.g. 'browse' or 'browse ./'
@@ -62,7 +62,7 @@ std::string serverconnection::commandParser(std::string command) {
         } else if (this->commandEquals(commandAndParameter.at(0), "bye") || this->commandEquals(commandAndParameter.at(0), "quit")) {
             std::cout << "Shutdown of connection requested" << std::endl;
             this->closureRequested = true;
-            //        close (this->fd);
+            res = "221 Goodbye.";
         } else {
             // Unknown / no command / enter
             std::cout << "Unknown command encountered '" << commandAndParameter.at(0) << "'!" << std::endl;
@@ -77,7 +77,7 @@ std::string serverconnection::commandParser(std::string command) {
             std::cout << "Browsing files of directory '" << curDir << "'" << std::endl;
             this->directories.clear();
             this->files.clear();
-            this->fo->browse(curDir,directories,files);
+            this->fo->browse(curDir, directories, files);
             for (unsigned int j = 0; j < directories.size(); j++) {
                 res += directories.at(j) + "/\n";
             }
