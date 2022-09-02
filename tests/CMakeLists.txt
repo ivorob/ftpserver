@@ -23,6 +23,7 @@ SET (SOURCES
         ${MAIN_SRC_DIR}/servercore.cpp
         ${MAIN_SRC_DIR}/serverconnection.cpp
         ${MAIN_SRC_DIR}/fileoperator.cpp
+        ${MAIN_SRC_DIR}/Socket.cpp
     )
 
 SET (HEADERS
@@ -34,6 +35,7 @@ SET (HEADERS
         ${MAIN_INCLUDE_DIR}/serverconnection.h
         ${MAIN_INCLUDE_DIR}/fileoperator.h
         ${MAIN_INCLUDE_DIR}/OSApi.h
+        ${MAIN_INCLUDE_DIR}/Socket.h
     )
 
 ADD_EXECUTABLE (tests ${SOURCES} ${HEADERS})

@@ -25,6 +25,7 @@ SET (SOURCES
         ${SRC_DIR}/ftpserver.cpp
         ${SRC_DIR}/OSApi.cpp
         ${SRC_DIR}/OSApiImpl.cpp
+        ${SRC_DIR}/Socket.cpp
     )
 
 SET (HEADERS
@@ -34,6 +35,7 @@ SET (HEADERS
         ${INCLUDE_DIR}/AbstractOSApi.h
         ${INCLUDE_DIR}/OSApi.h
         ${INCLUDE_DIR}/OSApiImpl.h
+        ${INCLUDE_DIR}/Socket.h
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})

@@ -1,5 +1,6 @@
 #include <cstdlib>
 #include <iostream>
+#include <memory>
 
 #include "servercore.h"
 
@@ -21,7 +22,8 @@ int main(int argc, char** argv) {
             case 3:
                 port = atoi(argv[2]); // Cast str to int, set port
             case 2:
-                fileoperator* db = new fileoperator(dir);
+                // TODO: replace it by std::filesystem
+                auto db = std::make_unique<fileoperator>(dir);
                 // Test if dir exists
                 if (db->dirCanBeOpenend(argv[1])) {
                     dir = argv[1]; // set default server directory
@@ -33,10 +35,7 @@ int main(int argc, char** argv) {
         }
     }
 
-    servercore* myServer = new servercore(port, dir, commandOffset);
-
-    /// @TODO: some sort of server shutdown command??
-    delete myServer; // Close connection, for the good tone
+    auto myServer = std::make_unique<servercore>(port, dir, commandOffset);
 
     return (EXIT_SUCCESS);
 }

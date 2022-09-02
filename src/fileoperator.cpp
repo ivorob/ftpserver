@@ -3,19 +3,20 @@
 
 // Constructor, gets the current server root dir as a parameter
 fileoperator::fileoperator(std::string dir) {
-    this->completePath.push_front(dir); // Insert the root dir at the beginning
+    this->completePath.push_front(std::move(dir)); // Insert the root dir at the beginning
 }
 
 // Destructor, let the cleaner rage
 fileoperator::~fileoperator() {
     this->closeWriteFile(); // Close the file (if any is open)
-    this->completePath.clear();
 }
 
 // Relative directories only, strict
 bool fileoperator::changeDir(std::string newPath, bool strict) {
-    if (strict) // When using strict mode, the function only allows one subdirectory and not several subdirectories, e.g. like sub/subsub/dir/ ... 
+    if (strict) {
         getValidDir(newPath); // check error cases, e.g. newPath = '..//' , '/home/user/' , 'subdir' (without trailing slash), etc...
+    }
+
     // If change to a higher directory is requested
     if ( (newPath.compare("..") == 0) || (newPath.compare("../") == 0) ) {
         // If we are already in the server root dir, prohibit the change to a higher directory
@@ -32,7 +33,7 @@ bool fileoperator::changeDir(std::string newPath, bool strict) {
         std::cout << "Change to same dir requested (nothing done)!" << std::endl;
         return (EXIT_SUCCESS); // 0 (?)
     }
-// std::cout << "dir " << this->getCurrentWorkingDir().append(newPath) << std::endl;
+
     // Normal (sub-)directory given
     if (this->dirCanBeOpenend(this->getCurrentWorkingDir().append(newPath))) {
         this->completePath.push_back(newPath); // Add the new working dir to our path list
@@ -43,13 +44,13 @@ bool fileoperator::changeDir(std::string newPath, bool strict) {
 }
 
 // check error cases, e.g. newPath = '..//' , '/home/user/' , 'subdir' (without trailing slash), etc... and return a clean, valid string in the form 'subdir/'
-void fileoperator::getValidDir(std::string &dirName) {
+void fileoperator::getValidDir(std::string& dirName) {
     std::string slash = "/";
     size_t foundSlash = 0;
-    while ( (foundSlash = dirName.find_first_of(slash),(foundSlash)) != std::string::npos) {
-//        std::cout << " / @ " << foundSlash << std::endl;
-        dirName.erase(foundSlash++,1); // Remove all slashs
+    while ((foundSlash = dirName.find_first_of(slash), (foundSlash)) != std::string::npos) {
+        dirName.erase(foundSlash++, 1); // Remove all slashs
     }
+
     dirName.append(slash); // Trailing slash is good and required, append it
 }
 
@@ -57,25 +58,26 @@ void fileoperator::getValidDir(std::string &dirName) {
 void fileoperator::getValidFile(std::string &fileName) {
     std::string slash = "/";
     size_t foundSlash = 0;
-    while ( (foundSlash = fileName.find_first_of(slash),(foundSlash)) != std::string::npos) {
-//        std::cout << " / @ " << foundSlash << std::endl;
-        fileName.erase(foundSlash++,1); // Remove all slashs
+    while ((foundSlash = fileName.find_first_of(slash), (foundSlash)) != std::string::npos) {
+        fileName.erase(foundSlash++, 1); // Remove all slashs
     }
 }
 
 // Strips out the string for the server root, e.g. <root>/data/file -> data/file
 void fileoperator::stripServerRootString(std::string &dirOrFileName) {
     size_t foundRootString = 0;
-    if ((dirOrFileName.find_first_of(SERVERROOTPATHSTRING) ) == foundRootString ) {
-        int rootStringLength = ((std::string)SERVERROOTPATHSTRING).length();
-        dirOrFileName = dirOrFileName.substr( rootStringLength, dirOrFileName.length() - rootStringLength);
+    if ((dirOrFileName.find_first_of(SERVERROOTPATHSTRING)) == foundRootString) {
+        size_t rootStringLength = ((std::string)SERVERROOTPATHSTRING).length();
+        dirOrFileName = dirOrFileName.substr(rootStringLength, dirOrFileName.length() - rootStringLength);
     }
 }
 
 // Creates a directory with the specified name in the current working directory
 bool fileoperator::createDirectory(std::string &dirName, bool strict) {
-    if (strict) // When using strict mode, the function only allows one subdirectory and not several subdirectories, e.g. like sub/subsub/dir/ ...
+    if (strict) {
         getValidDir(dirName); // check error cases, e.g. newPath = '..//' , '/home/user/' , 'subdir' (without trailing slash), etc...
+    }
+
     // Prohibit deletion of dir ../ beyond server root
     if ((dirName.compare("../") == 0) && (this->completePath.size() < 2)) {
         dirName = "./";
@@ -88,7 +90,8 @@ bool fileoperator::createDirectory(std::string &dirName, bool strict) {
 }
 
 // Read a block from the open file
-std::unique_ptr<char[]> fileoperator::readFileBlock(std::ifstream& input, unsigned long &sizeInBytes) {
+std::unique_ptr<char[]> fileoperator::readFileBlock(std::ifstream& input, unsigned long& sizeInBytes) {
+    sizeInBytes = 0;
     if (!input) {
         return {};
     }
@@ -132,6 +135,7 @@ std::ifstream fileoperator::readFile(std::string fileName) {
 
 int fileoperator::beginWriteFile(std::string fileName) {
     stripServerRootString(fileName);
+
     this->currentOpenFile.open(fileName.c_str(), std::ios::out|std::ios::binary|std::ios::app); // output file
     if(!this->currentOpenFile) {
         std::cerr << "Cannot open output file '" << fileName << "'" << std::endl;
@@ -147,6 +151,7 @@ int fileoperator::writeFileBlock(std::string content) {
         std::cerr << "Cannot write to output file" << std::endl;
         return (EXIT_FAILURE);
     }
+
     std::cout << "Appending to file" << std::endl;
     (this->currentOpenFile) << content;
     return (EXIT_SUCCESS);
@@ -163,8 +168,10 @@ void fileoperator::closeWriteFile() {
 // Same as unix touch command
 // Avoid touch ../file beyond server root!
 bool fileoperator::createFile(std::string &fileName, bool strict) {
-    if (strict)
+    if (strict) {
         this->getValidFile(fileName); // Avoid touch ../file beyond server root!
+    }
+
     try {
         std::ofstream fileout;
         fileout.open(this->getCurrentWorkingDir().append(fileName).c_str(), std::ios::out|std::ios::binary|std::ios::app);
@@ -173,6 +180,7 @@ bool fileoperator::createFile(std::string &fileName, bool strict) {
         std::cerr << e.what() << std::endl;
         return (EXIT_FAILURE);
     }
+
     return (EXIT_SUCCESS);
 }
 
@@ -183,8 +191,10 @@ bool fileoperator::createFile(std::string &fileName, bool strict) {
  */
 // Avoid rm ../file beyond server root!
 bool fileoperator::deleteFile(std::string fileName, bool strict) {
-    if (strict)
+    if (strict) {
         this->getValidFile(fileName); // Avoid rm ../file beyond server root!
+    }
+
     if (api()->remove(this->getCurrentWorkingDir().append(fileName).c_str()) != 0 ) {
         std::cerr << "Error deleting file '" << fileName << "'" << std::endl;
         return (EXIT_FAILURE);
@@ -208,8 +218,8 @@ bool fileoperator::deleteDirectory(std::string dirName, bool cancel, std::string
     if (cancel) {
         return true;
     }
-    getValidDir(dirName);
 
+    getValidDir(dirName);
     pathToDir.append(dirName);
 
     std::vector<std::string> directories;
@@ -218,7 +228,7 @@ bool fileoperator::deleteDirectory(std::string dirName, bool cancel, std::string
 
     // Now walk over all files in the current directory and delete them
     auto fileIterator = files.begin();
-    while (fileIterator != files.end() ) {
+    while (fileIterator != files.end()) {
         cancel = (this->deleteFile(pathToDir + (*fileIterator++), false) || cancel);
     }
 
@@ -244,6 +254,7 @@ bool fileoperator::deleteDirectory(std::string dirName, bool cancel, std::string
             this->deletedDirectories.push_back(pathToDir);
         }
     }
+
     return cancel; // false = no error, true = error
 }
 
@@ -283,6 +294,7 @@ std::vector<std::string> fileoperator::getStats(std::string fileName, struct sta
         std::cerr << "Error when issuing stat() on '" << fileName << "'!" << std::endl;
         return result; // Bail out with no results
     }
+
     struct passwd *pwd;
     struct group *grp;
     std::string tempRes;
@@ -314,22 +326,24 @@ S_IXOTH	00001	others have execute permission
     int oth_x = ( Status.st_mode & S_IXGRP ) ? 1 : 0;
     int oth_t = ( oth_r << 2 ) | ( oth_w << 1 ) | oth_x;
 
-    IntToString(usr_t*100 + grp_t*10 + oth_t, tempRes);
+    IntToString(usr_t * 100 + grp_t * 10 + oth_t, tempRes);
     result.push_back(tempRes); // AccessRights, Unix file/dir permissions
     // Try to read out the group name if available, else return group id
-    if ((grp = getgrgid(Status.st_gid)) != NULL) {
+    if ((grp = getgrgid(Status.st_gid)) != nullptr) {
         result.push_back((std::string)grp->gr_name); // Group name
     } else {
         IntToString(Status.st_gid, tempRes);
         result.push_back(tempRes); // Group id
     }
+
     // Try to read out owner owner name if available, else return owner id
-    if ((pwd = getpwuid(Status.st_uid)) != NULL) {
+    if ((pwd = getpwuid(Status.st_uid)) != nullptr) {
         result.push_back((std::string)pwd->pw_name); // Owner name
     } else {
         IntToString(Status.st_uid, tempRes);
         result.push_back(tempRes); // Owner id
     }
+
     // The time of last modification
     struct tm *date;
     date = localtime(&Status.st_mtime); // LastModificationTime
@@ -373,11 +387,12 @@ std::string fileoperator::getParentDir() {
  */
 unsigned long fileoperator::getDirSize(std::string dirName) {
     getValidDir(dirName);
+
     std::vector<std::string> directories;
     std::vector<std::string> files;
-    this->browse(dirName,directories,files);
+    this->browse(dirName, directories, files);
     // directories -2 because of "." and ".." directories, which are not be considered
-    return ((directories.size()-2) + files.size());
+    return ((directories.size() - 2) + files.size());
 }
 
 // Returns the path to the current working dir starting from the server root dir
@@ -390,16 +405,12 @@ std::string fileoperator::getCurrentWorkingDir(bool showRootPath) {
             // If the real root path should be hidden to client
             if (!showRootPath) {
                 fullpath.append(SERVERROOTPATHSTRING);                
-            } else { // If server root path should be shown (server-internal)
-                // The lowest path already is chdir()'d into, so we do not need it
-//                fullpath.append("./");
-//                fullpath.append(*(singleDir));
             }
         } else {
             fullpath.append(*(singleDir));
         }
     }
-//    std::cout << "Path '" << fullpath << "'" << std::endl;
+
     return fullpath;
 }
 
@@ -407,28 +418,30 @@ std::string fileoperator::getCurrentWorkingDir(bool showRootPath) {
 void fileoperator::browse(std::string dir, std::vector<std::string> &directories, std::vector<std::string> &files, bool strict) {
     if (strict) {// When using strict mode, the function only allows one subdirectory and not several subdirectories, e.g. like sub/subsub/dir/ ...
         getValidDir(dir);
+
         if ((dir.compare("../") == 0) && (this->completePath.size() < 2)) { // Prohibit ../ beyond server root
             dir = "./";
             std::cerr << "Error: Change beyond server root requested (prohibited)!" << std::endl;
         }
     }
+
     if (dir.compare("./") != 0) {
         dir = this->getCurrentWorkingDir().append(dir);
     } else {
         dir = this->getCurrentWorkingDir(true);
-//        std::cout << "Yes" << std::endl;
     }
+
     std::cout << "Browsing '" << dir << "'" << std::endl;
-    DIR *dp;
-    struct dirent *dirp;
     if (this->dirCanBeOpenend(dir)) {
         try {
-            dp = api()->opendir(dir.c_str());
-            while ((dirp = api()->readdir(dp)) != NULL) {
+            DIR* dp = api()->opendir(dir.c_str());
+            struct dirent *dirp = nullptr;
+            while ((dirp = api()->readdir(dp)) != nullptr) {
                 // Prohibit ../ only if the current working dir is already the server root directory
-                if (((std::string)dirp->d_name).compare("..") == 0 && this->completePath.size() < 2)
+                if (((std::string)dirp->d_name).compare("..") == 0 && this->completePath.size() < 2) {
                     continue;
-//                if( ((std::string)dirp->d_name).compare(".") == 0 || ((std::string)dirp->d_name).compare("..") == 0 ) continue;
+                }
+
                 /// @WARNING, @KLUDGE: symbolic links to directories not supported ?!
                 if( dirp->d_type == DT_DIR ) {
                     directories.push_back(std::string(dirp->d_name));
@@ -436,6 +449,7 @@ void fileoperator::browse(std::string dir, std::vector<std::string> &directories
                     files.push_back(std::string(dirp->d_name));
                 }
             }
+
             api()->closedir(dp);
         } catch (std::exception e) {
             std::cerr << "Error (" << e.what() << ") opening '" << dir << "'" << std::endl;

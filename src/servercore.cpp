@@ -4,9 +4,16 @@
 #include "serverconnection.h"
 #include "OSApi.h"
 
-servercore::servercore(uint port, std::string dir, unsigned short commandOffset) : dir(dir), commandOffset(commandOffset), shutdown(false), connId(0) {
-    if (api()->chdir(dir.c_str()))
+servercore::servercore(uint port, std::string dir, unsigned short commandOffset) 
+    : dir(dir)
+    , commandOffset(commandOffset)
+    , shutdown(false)
+    , connId(0) {
+
+    if (api()->chdir(dir.c_str())) {
         std::cerr << "Directory could not be changed to '" << dir << "'!" << std::endl;
+    }
+
     this->initSockets(port);
     this->start();
 }
@@ -14,17 +21,11 @@ servercore::servercore(uint port, std::string dir, unsigned short commandOffset)
 // Free up used memory by cleaning up all the object variables;
 servercore::~servercore() {
     std::cout << "Server shutdown" << std::endl;
-    closeListenSocket();
-    this->freeAllConnections(); // Deletes all connection objects and frees their memory
+    shutdownServer();
 }
 
-void servercore::closeListenSocket()
-{
+void servercore::shutdownServer() {
     this->shutdown = true;
-    if (this->s != -1) {
-        api()->close(this->s);
-        this->s = -1;
-    }
 }
 
 // Builds the list of sockets to keep track on and removes the closed ones
@@ -35,83 +36,64 @@ void servercore::buildSelectList() {
     FD_ZERO(&(this->socks));
 
     // FD_SET() adds the file descriptor "sock" to the fd_set so that select() will return if a connection comes in on that socket (in which case accept() is called, etc.)
-    FD_SET(this->s, &(this->socks));
+    FD_SET(this->listenSocket.native(), &(this->socks));
 
     // Iterates over all the possible connections and adds those sockets to the fd_set and erases closed ones
-    std::vector<serverconnection*>::iterator iter = this->connections.begin();
-    while( iter != this->connections.end() ) {
+    auto iter = this->connections.begin();
+    while (iter != this->connections.end()) {
         if ((*iter)->getCloseRequestStatus()) { // This connection was closed, flag is set -> remove its corresponding object and free the memory
             std::cout << "Connection with Id " << (*iter)->getConnectionId() << " closed! " << std::endl;
-            delete (*iter); // Clean up
             this->connections.erase(iter); // Delete it from our vector
-            if (this->connections.empty() || (iter == this->connections.end()))
+            if (this->connections.empty() || (iter == this->connections.end())) {
                 return; // Don't increment the iterator when there is nothing to iterate over - avoids crash
+            }
         } else {
             int currentFD = (*iter)->getFD();
             if (currentFD != 0) {
                 FD_SET(currentFD, &(this->socks)); // Adds the socket file descriptor to the monitoring for select
-                if (currentFD > this->highSock)
+                if (currentFD > this->highSock) {
                     this->highSock = currentFD; // We need the highest socket for select
+                }
             }
         }
+
         ++iter; // Increment iterator
     }
 }
 
-// Clean up everything
-void servercore::freeAllConnections() {
-    std::vector<serverconnection*>::iterator iter = this->connections.begin();
-    while( iter != this->connections.end() ) {
-        delete (*(iter++)); // Clean up, issue destructor implicitly
-    }
-    this->connections.clear(); // Delete all deleted connections also from our vector
-}
-
 // Accepts new connections and stores the connection object with fd in a vector
 int servercore::handleNewConnection() {
-    int fd; // Socket file descriptor for incoming connections
+    try {
+        Socket newSocket = this->listenSocket.accept();
 
-    this->cli_size = sizeof(this->cli);
-    fd = api()->accept(this->s, (struct sockaddr*) &cli, &cli_size);
-    if (fd < 0) {
+        // Gets the socket fd flags and add the non-blocking flag to the sfd
+        this->setNonBlocking(newSocket.native());
+
+        // Get the client IP address
+        char ipstr[INET6_ADDRSTRLEN];
+        int port;
+        this->addrLength = sizeof this->addrStorage;
+        getpeername(newSocket.native(), (struct sockaddr*) &this->addrStorage, &(this->addrLength));
+        std::string hostId = "";
+        if (this->addr.sin_family == AF_INET) {
+            struct sockaddr_in* fd = (struct sockaddr_in*) &(this->addrStorage);
+            port = ntohs(fd->sin_port);
+            inet_ntop(AF_INET, &fd->sin_addr, ipstr, sizeof ipstr);
+            hostId = (std::string)ipstr;
+        }
+
+        std::cout << "Connection accepted: FD=" << newSocket.native()
+            << " - Slot=" << (this->connections.size() + 1) 
+            << (++this->connId) << std::endl;
+        // The new connection (object)
+        auto conn = std::make_unique<serverconnection>(
+                std::move(newSocket), this->connId, this->dir, hostId, this->commandOffset); // The connection vector
+        this->connections.push_back(std::move(conn));
+    } catch (const std::exception& e) {
         std::cerr << "Error while accepting client" << std::endl;
         return (EXIT_FAILURE);
     }
 
-    // Gets the socket fd flags and add the non-blocking flag to the sfd
-    this->setNonBlocking(fd);
-
-    // Something (?) went wrong, new connection could not be handled
-    if (fd == -1) {
-        std::cerr << "Something went wrong, new connection could not be handled (Maybe server too busy, too many connections?)" << std::endl;
-        try {
-            api()->close(fd);
-        } catch (std::exception e) {
-            std::cerr << e.what() << std::endl;
-        }
-        return (EXIT_FAILURE); // Return at this point
-    }
-
-    // Get the client IP address
-    char ipstr[INET6_ADDRSTRLEN];
-    int port;
-    this->addrLength = sizeof this->addrStorage;
-    getpeername(fd, (struct sockaddr*) &this->addrStorage, &(this->addrLength));
-    std::string hostId = "";
-    if (this->addr.sin_family == AF_INET) {
-        struct sockaddr_in* fd = (struct sockaddr_in*) &(this->addrStorage);
-        port = ntohs(fd->sin_port);
-        inet_ntop(AF_INET, &fd->sin_addr, ipstr, sizeof ipstr);
-        hostId = (std::string)ipstr;
-    }
-
-    std::cout << "Connection accepted: FD=" << fd 
-              << " - Slot=" << (this->connections.size() + 1) 
-              << (++this->connId) << std::endl;
-    // The new connection (object)
-    serverconnection* conn = new serverconnection(fd, this->connId, this->dir, hostId, this->commandOffset); // The connection vector
-    // Add it to our list for better management / convenience
-    this->connections.push_back(conn);
     return (EXIT_SUCCESS);
 }
 
@@ -119,15 +101,17 @@ int servercore::handleNewConnection() {
 void servercore::readSockets() {
     // OK, now socks will be set with whatever socket(s) are ready for reading. First check our "listening" socket, and then check the sockets in connectlist
     // If a client is trying to connect() to our listening socket, select() will consider that as the socket being 'readable' and thus, if the listening socket is part of the fd_set, accept a new connection
-    if (FD_ISSET(this->s,&(this->socks))) {
-//        this->handleNewConnection();
-        if (this->handleNewConnection()) return; // Always check for errors
+    if (FD_ISSET(this->listenSocket.native(), &(this->socks))) {
+        if (handleNewConnection()) {
+            return; // Always check for errors
+        }
     }
+
     // Now check connectlist for available data
     // Run through our sockets and check to see if anything happened with them, if so 'service' them
-    for (unsigned int listnum = 0; listnum < this->connections.size(); listnum++) {
-        if (FD_ISSET(this->connections.at(listnum)->getFD(),&(this->socks))) {
-            this->connections.at(listnum)->respondToQuery(); // Now that data is available, deal with it!
+    for (auto& connections : this->connections) {
+        if (FD_ISSET(connections->getFD(), &(this->socks))) {
+            connections->respondToQuery(); // Now that data is available, deal with it!
         }
     }
 }
@@ -135,7 +119,6 @@ void servercore::readSockets() {
 // Server entry point and main loop accepting and handling connections
 int servercore::start() {
     struct timeval timeout; // Timeout for select
-    int readsocks; // Number of sockets ready for reading
     timeout.tv_sec = 1; // Timeout = 1 sec
     timeout.tv_usec = 0;
     // Wait for connections, main server loop
@@ -144,26 +127,27 @@ int servercore::start() {
         this->buildSelectList(); // Clear out data handled in the previous iteration, clear closed sockets
 
         // Multiplexes between the existing connections regarding to data waiting to be processed on that connection (that's actually what select does)
-        readsocks = api()->select(this->highSock+1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
-
+        int readsocks = api()->select(this->highSock+1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
         if (readsocks < 0) {
             std::cerr << "Error calling select" << std::endl;
             return (EXIT_FAILURE);
         }
 
-        this->readSockets(); // Handle the sockets (accept new connections or handle incoming data or do nothing [if no data])
+        readSockets(); // Handle the sockets (accept new connections or handle incoming data or do nothing [if no data])
     }
+
     return (EXIT_SUCCESS);
 }
 
 // Sets the given socket to non-blocking mode
-void servercore::setNonBlocking(int &sock) {
+void servercore::setNonBlocking(int sock) {
     this->sflags = fcntl(sock, F_GETFL); // Get socket flags
     int opts = fcntl(sock,F_GETFL, 0);
     if (opts < 0) {
         std::cerr << "Error getting socket flags" << std::endl;
         return;
     }
+
     opts = (opts | O_NONBLOCK);
     if (fcntl(sock,F_SETFL,opts) < 0) {
         std::cerr << "Error setting socket to non-blocking" << std::endl;
@@ -173,34 +157,27 @@ void servercore::setNonBlocking(int &sock) {
 
 // Initialization of sockets / socket list with options and error checking
 void servercore::initSockets(int port) {
-    int reuseAllowed = 1;
-    this->maxConnectionsInQuery = 50;
-    this->addr.sin_family = AF_INET; // PF_INET;
-    this->addr.sin_port = htons(port);
-    this->addr.sin_addr.s_addr = INADDR_ANY; // Server can be connected to from any host
     // PF_INET: domain, Internet; SOCK_STREAM: datastream, TCP / SOCK_DGRAM = UDP => WARNING, this can change the byte order!; for 3rd parameter==0: TCP preferred
-    this->s = api()->socket(PF_INET, SOCK_STREAM, 0);
-    if (this->s == -1) {
-        std::cerr << "socket() failed" << std::endl;
-        this->shutdown = true;
+    try {
+        this->listenSocket = Socket(api()->socket(PF_INET, SOCK_STREAM, 0));
+        if (this->listenSocket.allowReuse() < 0) {
+            throw std::runtime_error("setsockopt() failed");
+        }
+        this->setNonBlocking(this->listenSocket.native());
+
+        this->addr.sin_family = AF_INET; // PF_INET;
+        this->addr.sin_port = htons(port);
+        this->addr.sin_addr.s_addr = INADDR_ANY; // Server can be connected to from any host
+        this->listenSocket.bind(this->addr);
+
+        this->maxConnectionsInQuery = 50;
+        this->listenSocket.listen(this->maxConnectionsInQuery);
+    } catch (const std::runtime_error& e) {
+        std::cerr << e.what() << std::endl;
+        shutdownServer();
         return;
     }
-    else if (api()->setsockopt(this->s, SOL_SOCKET, SO_REUSEADDR, &reuseAllowed, sizeof(reuseAllowed)) < 0) { //  enable reuse of socket, even when it is still occupied
-        std::cerr << "setsockopt() failed" << std::endl;
-        closeListenSocket();
-        return;
-    }
-    this->setNonBlocking(this->s);
-    if (api()->bind(this->s, (struct sockaddr*) &addr, sizeof(addr)) == -1) {
-        std::cerr << ("bind() failed (do you have the apropriate rights? is the port unused?)") << std::endl;
-        closeListenSocket();
-        return;
-    } // 2nd parameter (backlog): number of connections in query, can be also set SOMAXCONN
-    else if (api()->listen(this->s, this->maxConnectionsInQuery) == -1) {
-        std::cerr << ("listen () failed") << std::endl;
-        closeListenSocket();
-        return;
-    }
-    this->highSock = this->s; // This is the first (and the main listening) socket
+
+    this->highSock = this->listenSocket.native(); // This is the first (and the main listening) socket
     std::cout << "Server started and listening at port " << port << ", default server directory '" << this->dir << "'" << ((this->commandOffset == 3) ? ", for use with telnet" : "")  << std::endl;
 }

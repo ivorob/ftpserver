@@ -1,30 +1,31 @@
 #pragma once
 
-#include "fileoperator.h"
 #include <vector>
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <sys/fcntl.h>
 #include <algorithm> // for transform command
+#include <memory>
+
+#include "fileoperator.h"
+#include "Socket.h"
 
 // Separator for commands
 #define SEPARATOR " "
 
 class serverconnection {
 public:
-    serverconnection(int filedescriptor, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset = 1);
+    serverconnection(Socket currentSocket, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset = 1);
     std::string commandParser(std::string command);
     std::vector<std::string> extractParameters(std::string command);
-    virtual ~serverconnection();
+    ~serverconnection();
     void respondToQuery();
-    int getFD();
-    bool getCloseRequestStatus();
-    unsigned int getConnectionId();
-
+    int getFD() const;
+    bool getCloseRequestStatus() const;
+    unsigned int getConnectionId() const;
 private:
-    int fd; // Filedescriptor per each threaded object
-    int fdflags;
+    Socket currentSocket;
     bool closureRequested;
     std::vector<std::string> directories;
     std::vector<std::string> files;
@@ -34,7 +35,7 @@ private:
     bool uploadCommand;
     bool downloadCommand;
     std::string parameter;
-    fileoperator* fo; // For browsing, writing and reading
+    std::unique_ptr<fileoperator> fo; // For browsing, writing and reading
     void sendToClient(const char* response, unsigned long length);
     void sendToClient(std::string response);
     bool commandEquals(std::string a, std::string b);

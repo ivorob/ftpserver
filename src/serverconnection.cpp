@@ -1,36 +1,40 @@
 #include "serverconnection.h"
 #include "OSApi.h"
 
-// Destructor, clean up all the mess
-serverconnection::~serverconnection() {
-    std::cout << "Connection terminated to client (connection id " << this->connectionId << ")" << std::endl;
-    delete this->fo;
-    api()->close(this->fd);
-    this->directories.clear();
-    this->files.clear();
-}
-
 // Constructor
-serverconnection::serverconnection(int filedescriptor, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) : fd(filedescriptor), connectionId(connId), dir(defaultDir), hostAddress(hostId), commandOffset(commandOffset), closureRequested(false), uploadCommand(false), downloadCommand(false),  receivedPart(0), parameter("") {
-//    this->files = std::vector<std::string>();
+serverconnection::serverconnection(Socket currentSocket, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) 
+    : currentSocket(std::move(currentSocket))
+    , connectionId(connId)
+    , dir(defaultDir)
+    , hostAddress(hostId)
+    , commandOffset(commandOffset)
+    , closureRequested(false)
+    , uploadCommand(false)
+    , downloadCommand(false)
+    , receivedPart(0)
+    , parameter("")
+    , fo(std::make_unique<fileoperator>(dir)) {
+
     // Send hello
     std::string data = "220 FTP server ready.\n";
     sendToClient(data.c_str(), data.size());
-    this->fo = new fileoperator(this->dir); // File and directory browser
     std::cout << "Connection to client '" << this->hostAddress << "' established" << std::endl;
 }
 
+// Destructor, clean up all the mess
+serverconnection::~serverconnection() {
+    std::cout << "Connection terminated to client (connection id " << this->connectionId << ")" << std::endl;
+}
+
 // Check for matching (commands/strings) with compare method
-bool serverconnection::commandEquals(std::string a, std::string b) {
+bool serverconnection::commandEquals(std::string command, std::string commandToCompare) {
     // Convert to lower case for case-insensitive checking
-    std::transform(a.begin(), a.end(),a.begin(), tolower);
-    int found = a.find(b);
-    return (found!=std::string::npos);
+    std::transform(command.begin(), command.end(), command.begin(), tolower);
+    return (command.find(commandToCompare) != std::string::npos);
 }
 
 // Command switch for the issued client command, only called when this->command is set to 0
 std::string serverconnection::commandParser(std::string command) {
-    std::string res;
     this->uploadCommand = false;
     struct stat Status;
     // Commands can have either 0 or 1 parameters, e.g. 'browse' or 'browse ./'
@@ -39,6 +43,7 @@ std::string serverconnection::commandParser(std::string command) {
 
     /// @TODO: Test if prone to DOS-attacks (if loads of garbage is submitted)???
     // If command with no argument was issued
+    std::string res;
     if (commandAndParameter.size() == 1) {
         if (this->commandEquals(commandAndParameter.at(0), "list")) {
             // dir to browse
@@ -185,25 +190,31 @@ std::vector<std::string> serverconnection::extractParameters(std::string command
     while (!command.empty() && (command.back() == '\n' || command.back() == '\r')) {
         command.pop_back();
     }
-    std::vector<std::string> res;
+
     std::size_t previouspos = 0;
-    std::size_t pos;
+    std::size_t position = std::string::npos;
+    std::vector<std::string> result;
     // First get the command by taking the string and walking from beginning to the first blank
-    if ((pos = command.find(SEPARATOR, previouspos)) != std::string::npos) { // No empty string
-        res.push_back(command.substr(int(previouspos),int(pos-previouspos))); // The command
+    if ((position = command.find(SEPARATOR, previouspos)) != std::string::npos) { // No empty string
+        result.push_back(command.substr(static_cast<int>(previouspos), static_cast<int>(position - previouspos))); // The command
     }
-    if (command.length() > (pos+1)) {
-        //For telnet testing commandOffset = 3 because of the enter control sequence at the end of the telnet command (otherwise = 1)
-        res.push_back(command.substr(int(pos+1),int(command.length()-(pos+(this->commandOffset))))); // The parameter (if existent)
+
+    if (command.length() > (position + 1)) {
+        result.push_back(
+            command.substr(
+                static_cast<int>(position + 1),
+                static_cast<int>(command.length() - (position + (this->commandOffset)))
+            )
+        ); // The parameter (if existent)
     }
-    return res;
+
+    return result;
 }
 
 // Receives the incoming data and issues the apropraite commands and responds
 void serverconnection::respondToQuery() {
-    char buffer[BUFFER_SIZE];
-    int bytes;
-    bytes = api()->recv(this->fd, buffer, sizeof(buffer), 0);
+    char buffer[BUFFER_SIZE] = {0};
+    int bytes = api()->recv(this->currentSocket.native(), buffer, sizeof(buffer), 0);
     // In non-blocking mode, bytes <= 0 does not mean a connection closure!
     if (bytes > 0) {
         std::string clientCommand = std::string(buffer, bytes);
@@ -231,11 +242,12 @@ void serverconnection::sendToClient(const char* response, unsigned long length) 
     // Now we're sending the response
     unsigned int bytesSend = 0;
     while (bytesSend < length) {
-        int ret = api()->send(this->fd, response+bytesSend, length-bytesSend, 0);
-        if (ret <= 0) {
+        int result = api()->send(this->currentSocket.native(), response + bytesSend, length - bytesSend, 0);
+        if (result <= 0) {
             return;
         }
-        bytesSend += ret;
+
+        bytesSend += result;
     }
 }
 
@@ -244,24 +256,26 @@ void serverconnection::sendToClient(std::string response) {
     // Now we're sending the response
     unsigned int bytesSend = 0;
     while (bytesSend < response.length()) {
-        int ret = api()->send(this->fd, response.c_str()+bytesSend, response.length()-bytesSend, 0);
-        if (ret <= 0) {
+        int result = api()->send(this->currentSocket.native(), 
+            response.c_str() + bytesSend, response.length() - bytesSend, 0);
+        if (result <= 0) {
             return;
         }
-        bytesSend += ret;
+
+        bytesSend += result;
     }
 }
 
 // Returns the file descriptor of the current connection
-int serverconnection::getFD() {
-    return this->fd;
+int serverconnection::getFD() const {
+    return this->currentSocket.native();
 }
 
 // Returns whether the connection was requested to be closed (by client)
-bool serverconnection::getCloseRequestStatus() {
+bool serverconnection::getCloseRequestStatus() const {
     return this->closureRequested;
 }
 
-unsigned int serverconnection::getConnectionId() {
+unsigned int serverconnection::getConnectionId() const {
     return this->connectionId;
 }
