@@ -1,4 +1,7 @@
 #include <unordered_map>
+#include <functional>
+#include <algorithm>
+#include <iterator>
 
 #include "FTPCommandFactory.h"
 #include "ftpcommands/Commands.h"
