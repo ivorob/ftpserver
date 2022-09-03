@@ -10,6 +10,7 @@
 
 #include "fileoperator.h"
 #include "Socket.h"
+#include "FTPCommandFactory.h"
 
 // Separator for commands
 #define SEPARATOR " "
@@ -26,6 +27,7 @@ public:
     unsigned int getConnectionId() const;
 private:
     Socket currentSocket;
+    FTP::CommandFactory ftpCommandFactory;
     bool closureRequested;
     std::vector<std::string> directories;
     std::vector<std::string> files;

@@ -24,6 +24,9 @@ SET (SOURCES
         ${MAIN_SRC_DIR}/serverconnection.cpp
         ${MAIN_SRC_DIR}/fileoperator.cpp
         ${MAIN_SRC_DIR}/Socket.cpp
+        ${MAIN_SRC_DIR}/FTPCommandFactory.cpp
+        ${MAIN_SRC_DIR}/ftpcommands/DefaultCommand.cpp
+        ${MAIN_SRC_DIR}/ftpcommands/UserCommand.cpp
     )
 
 SET (HEADERS
@@ -36,6 +39,10 @@ SET (HEADERS
         ${MAIN_INCLUDE_DIR}/fileoperator.h
         ${MAIN_INCLUDE_DIR}/OSApi.h
         ${MAIN_INCLUDE_DIR}/Socket.h
+        ${MAIN_INCLUDE_DIR}/FTPCommandFactory.h
+        ${MAIN_INCLUDE_DIR}/ftpcommands/DefaultCommand.h
+        ${MAIN_INCLUDE_DIR}/ftpcommands/UserCommand.h
+        ${MAIN_INCLUDE_DIR}/ftpcommands/Commands.h
     )
 
 ADD_EXECUTABLE (tests ${SOURCES} ${HEADERS})

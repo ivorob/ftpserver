@@ -1,3 +1,5 @@
+#include <iterator>
+
 #include "serverconnection.h"
 #include "OSApi.h"
 
@@ -41,10 +43,18 @@ std::string serverconnection::commandParser(std::string command) {
     std::vector<std::string> commandAndParameter = this->extractParameters(command);
     std::cout << "Connection " << this->connectionId << ": ";
 
+    if (commandAndParameter.empty()) {
+        return "\n";
+    }
+
     /// @TODO: Test if prone to DOS-attacks (if loads of garbage is submitted)???
     // If command with no argument was issued
-    std::string res;
-    if (commandAndParameter.size() == 1) {
+    auto ftpCommand = ftpCommandFactory.create(commandAndParameter.at(0));
+    std::string res = ftpCommand->execute(
+        {std::make_move_iterator(commandAndParameter.begin() + 1),
+         std::make_move_iterator(commandAndParameter.end())}
+    );
+    /*if (commandAndParameter.size() == 1) {
         if (this->commandEquals(commandAndParameter.at(0), "list")) {
             // dir to browse
             std::string curDir = "./";
@@ -175,11 +185,15 @@ std::string serverconnection::commandParser(std::string command) {
         } else {
             // Unknown / no command
             std::cout << "Unknown command encountered '" << commandAndParameter.at(0) << "'!" << std::endl;
+            res = "502 " + ftpCommand->execute(
+                {std::make_move_iterator(commandAndParameter.begin() + 1),
+                 std::make_move_iterator(commandAndParameter.end())}
+            );
+
             commandAndParameter.clear();
             command = "";
-            res = "502 Command not implemented.";
         }
-    } 
+    }*/
 
     res += "\n";
     return res;

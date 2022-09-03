@@ -26,6 +26,10 @@ SET (SOURCES
         ${SRC_DIR}/OSApi.cpp
         ${SRC_DIR}/OSApiImpl.cpp
         ${SRC_DIR}/Socket.cpp
+        ${SRC_DIR}/FTPCommandFactory.cpp
+        # commands
+        ${SRC_DIR}/ftpcommands/DefaultCommand.cpp
+        ${SRC_DIR}/ftpcommands/UserCommand.cpp
     )
 
 SET (HEADERS
@@ -36,6 +40,12 @@ SET (HEADERS
         ${INCLUDE_DIR}/OSApi.h
         ${INCLUDE_DIR}/OSApiImpl.h
         ${INCLUDE_DIR}/Socket.h
+        ${INCLUDE_DIR}/FTPCommandFactory.h
+        # commands
+        ${SRC_DIR}/ftpcommands/DefaultCommand.h
+        ${SRC_DIR}/ftpcommands/UserCommand.h
+        ${SRC_DIR}/ftpcommands/Commands.h
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})
+TARGET_INCLUDE_DIRECTORIES (${PROJECT_NAME} PRIVATE ${INCLUDE_DIR})
