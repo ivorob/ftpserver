@@ -6,6 +6,7 @@
 // Constructor
 serverconnection::serverconnection(Socket currentSocket, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) 
     : currentSocket(std::move(currentSocket))
+    , ftpCommandFactory(makeContext())
     , connectionId(connId)
     , dir(defaultDir)
     , hostAddress(hostId)
@@ -21,6 +22,16 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
     std::string data = "220 FTP server ready.\n";
     sendToClient(data.c_str(), data.size());
     std::cout << "Connection to client '" << this->hostAddress << "' established" << std::endl;
+}
+
+FTP::Context serverconnection::makeContext() {
+    FTP::Context ftpContext;
+    ftpContext.shutdownConnection = std::bind(&serverconnection::shutdown, this);
+    return ftpContext;
+}
+
+void serverconnection::shutdown() {
+    this->closureRequested = true;
 }
 
 // Destructor, clean up all the mess

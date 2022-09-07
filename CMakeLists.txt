@@ -28,8 +28,10 @@ SET (SOURCES
         ${SRC_DIR}/Socket.cpp
         ${SRC_DIR}/FTPCommandFactory.cpp
         # commands
+        ${SRC_DIR}/FTPCommand.cpp
         ${SRC_DIR}/ftpcommands/DefaultCommand.cpp
         ${SRC_DIR}/ftpcommands/UserCommand.cpp
+        ${SRC_DIR}/ftpcommands/QuitCommand.cpp
     )
 
 SET (HEADERS
@@ -42,9 +44,12 @@ SET (HEADERS
         ${INCLUDE_DIR}/Socket.h
         ${INCLUDE_DIR}/FTPCommandFactory.h
         # commands
+        ${SRC_DIR}/FTPContext.h
+        ${SRC_DIR}/FTPCommand.h
         ${SRC_DIR}/ftpcommands/DefaultCommand.h
         ${SRC_DIR}/ftpcommands/UserCommand.h
         ${SRC_DIR}/ftpcommands/Commands.h
+        ${SRC_DIR}/ftpcommands/QuitCommand.h
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})

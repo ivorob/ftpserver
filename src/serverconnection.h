@@ -11,6 +11,7 @@
 #include "fileoperator.h"
 #include "Socket.h"
 #include "FTPCommandFactory.h"
+#include "FTPContext.h"
 
 // Separator for commands
 #define SEPARATOR " "
@@ -38,6 +39,11 @@ private:
     bool downloadCommand;
     std::string parameter;
     std::unique_ptr<fileoperator> fo; // For browsing, writing and reading
+private:
+    FTP::Context makeContext();
+
+    void shutdown();
+
     void sendToClient(const char* response, unsigned long length);
     void sendToClient(std::string response);
     bool commandEquals(std::string a, std::string b);
