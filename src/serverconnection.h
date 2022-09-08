@@ -27,6 +27,7 @@ public:
     bool getCloseRequestStatus() const;
     unsigned int getConnectionId() const;
 private:
+    std::shared_ptr<fileoperator> fo; // For browsing, writing and reading
     Socket currentSocket;
     FTP::CommandFactory ftpCommandFactory;
     bool closureRequested;
@@ -38,7 +39,6 @@ private:
     bool uploadCommand;
     bool downloadCommand;
     std::string parameter;
-    std::unique_ptr<fileoperator> fo; // For browsing, writing and reading
 private:
     FTP::Context makeContext();
 

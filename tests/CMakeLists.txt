@@ -29,6 +29,7 @@ SET (SOURCES
         ${MAIN_SRC_DIR}/ftpcommands/DefaultCommand.cpp
         ${MAIN_SRC_DIR}/ftpcommands/UserCommand.cpp
         ${MAIN_SRC_DIR}/ftpcommands/QuitCommand.cpp
+        ${MAIN_SRC_DIR}/ftpcommands/CurrentDirectoryCommand.cpp
     )
 
 SET (HEADERS
@@ -44,10 +45,11 @@ SET (HEADERS
         ${MAIN_INCLUDE_DIR}/FTPCommandFactory.h
         ${MAIN_INCLUDE_DIR}/FTPCommand.h
         ${MAIN_INCLUDE_DIR}/FTPContext.h
+        ${MAIN_INCLUDE_DIR}/ftpcommands/Commands.h
         ${MAIN_INCLUDE_DIR}/ftpcommands/DefaultCommand.h
         ${MAIN_INCLUDE_DIR}/ftpcommands/UserCommand.h
         ${MAIN_INCLUDE_DIR}/ftpcommands/QuitCommand.h
-        ${MAIN_INCLUDE_DIR}/ftpcommands/Commands.h
+        ${MAIN_INCLUDE_DIR}/ftpcommands/CurrentDirectoryCommand.h
     )
 
 ADD_EXECUTABLE (tests ${SOURCES} ${HEADERS})

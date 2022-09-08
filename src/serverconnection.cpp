@@ -5,7 +5,8 @@
 
 // Constructor
 serverconnection::serverconnection(Socket currentSocket, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) 
-    : currentSocket(std::move(currentSocket))
+    : fo(std::make_shared<fileoperator>(dir))
+    , currentSocket(std::move(currentSocket))
     , ftpCommandFactory(makeContext())
     , connectionId(connId)
     , dir(defaultDir)
@@ -15,8 +16,7 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
     , uploadCommand(false)
     , downloadCommand(false)
     , receivedPart(0)
-    , parameter("")
-    , fo(std::make_unique<fileoperator>(dir)) {
+    , parameter("") {
 
     // Send hello
     std::string data = "220 FTP server ready.\n";
@@ -27,6 +27,7 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
 FTP::Context serverconnection::makeContext() {
     FTP::Context ftpContext;
     ftpContext.shutdownConnection = std::bind(&serverconnection::shutdown, this);
+    ftpContext.fileoperator = this->fo;
     return ftpContext;
 }
 
