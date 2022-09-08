@@ -33,6 +33,7 @@ SET (SOURCES
         ${SRC_DIR}/ftpcommands/UserCommand.cpp
         ${SRC_DIR}/ftpcommands/QuitCommand.cpp
         ${SRC_DIR}/ftpcommands/CurrentDirectoryCommand.cpp
+        ${SRC_DIR}/ftpcommands/ChangeDirectoryCommand.cpp
     )
 
 SET (HEADERS
@@ -52,6 +53,7 @@ SET (HEADERS
         ${SRC_DIR}/ftpcommands/Commands.h
         ${SRC_DIR}/ftpcommands/QuitCommand.h
         ${SRC_DIR}/ftpcommands/CurrentDirectoryCommand.h
+        ${SRC_DIR}/ftpcommands/ChangeDirectoryCommand.h
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})

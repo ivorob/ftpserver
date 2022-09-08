@@ -4,3 +4,4 @@
 #include "UserCommand.h"
 #include "QuitCommand.h"
 #include "CurrentDirectoryCommand.h"
+#include "ChangeDirectoryCommand.h"
