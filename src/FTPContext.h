@@ -1,6 +1,7 @@
 #pragma once
 
 #include <functional>
+#include <memory>
 
 #include "fileoperator.h"
 
@@ -11,7 +12,7 @@ public:
     std::function<void()> shutdownConnection;
     std::function<std::string()> getCommand;
 
-    std::weak_ptr<fileoperator> fileoperator;
+    std::weak_ptr<fileoperator> fileOperator;
 };
 
 }

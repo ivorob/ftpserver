@@ -27,7 +27,7 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
 FTP::Context serverconnection::makeContext() {
     FTP::Context ftpContext;
     ftpContext.shutdownConnection = std::bind(&serverconnection::shutdown, this);
-    ftpContext.fileoperator = this->fo;
+    ftpContext.fileOperator = this->fo;
     return ftpContext;
 }
 
