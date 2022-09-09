@@ -47,8 +47,12 @@ TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
     std::string message;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&message](int, const void* msg, size_t len, int) -> int {
-            message.assign(reinterpret_cast<const char*>(msg), len);
-            return 0;
+            if (len != 0) {
+                message.assign(reinterpret_cast<const char*>(msg), len);
+                return 0;
+            }
+
+            return -1;
         });
 
     // Act
@@ -79,7 +83,7 @@ TEST_F(ServerConnectionTest, send_502_code_for_unimplemented_command)
     std::string response;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
-            if (msg == nullptr) {
+            if (msg == nullptr || len == 0) {
                 return -1;
             }
 
@@ -122,7 +126,7 @@ TEST_F(ServerConnectionTest, user_command_is_processed_successfully)
     std::string response;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
-            if (msg == nullptr) {
+            if (msg == nullptr || len == 0) {
                 return -1;
             }
 
@@ -165,7 +169,7 @@ TEST_F(ServerConnectionTest, current_directory_command_is_processed_successfully
     std::string response;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
-            if (msg == nullptr) {
+            if (msg == nullptr || len == 0) {
                 return -1;
             }
 
@@ -208,7 +212,7 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
     std::string response;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
-            if (msg == nullptr) {
+            if (msg == nullptr || len == 0) {
                 return -1;
             }
 
