@@ -240,68 +240,6 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
         out.str());
 }
 
-TEST_F(ServerConnectionTest, list_current_directory_command_is_processed_successfully)
-{
-    // Arrange
-    using ::testing::Return;
-
-    auto impl = makeImpl();
-
-    EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
-            std::string command = "LIST\n";
-            strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
-            return static_cast<int>(command.size());
-        });
-    std::string response;
-    EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
-            if (msg == nullptr) {
-                return -1;
-            }
-
-            response.assign(reinterpret_cast<const char*>(msg), len);
-            return 0;
-        });
-    EXPECT_CALL(*impl, close)
-        .WillRepeatedly(Return(0));
-    EXPECT_CALL(*impl, opendir)
-        .WillRepeatedly(Return(reinterpret_cast<DIR*>(0x12345678)));
-    EXPECT_CALL(*impl, closedir)
-        .WillRepeatedly(Return(0));
-    auto testDir = makeTestDir();
-    size_t i = 0;
-    EXPECT_CALL(*impl, readdir)
-        .WillRepeatedly([&testDir, &i](DIR*) -> struct dirent* {
-            if (i < testDir.size()) {
-                return &testDir[i++];
-            }
-
-            return nullptr;
-        });
-
-    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
-
-    std::ostringstream out;
-    ScopedStreamRedirector streamRedirector(std::cout, out);
-
-    // Act
-    serverConnection.respondToQuery();
-
-    // Assert
-    ASSERT_EQ(
-        "./\n"
-        "testDir/\n"
-        "file1\n"
-        "file2\n"
-        "\n",
-        response);
-    ASSERT_EQ(
-        "Connection 1: Browsing files of the current working dir\n"
-        "Browsing ''\n",
-        out.str());
-}
-
 TEST_F(ServerConnectionTest, bye_command_is_processed_successfully)
 {
     // Arrange
