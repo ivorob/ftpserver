@@ -15,8 +15,7 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
     , closureRequested(false)
     , uploadCommand(false)
     , downloadCommand(false)
-    , receivedPart(0)
-    , parameter("") {
+    , receivedPart(0) {
 
     // Send hello
     std::string data = "220 FTP server ready.\n";

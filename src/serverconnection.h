@@ -38,7 +38,6 @@ private:
     std::string hostAddress;
     bool uploadCommand;
     bool downloadCommand;
-    std::string parameter;
 private:
     FTP::Context makeContext();
 
