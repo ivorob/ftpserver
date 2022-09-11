@@ -39,17 +39,14 @@ std::vector<struct dirent> makeTestDir() {
 
 TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
 {
-    std::cerr << "create_regular_server_connection_is_succeeded" << std::endl;
     // Arrange
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
 
-    std::cerr << "makeImpl" << std::endl;
     auto impl = makeImpl();
     std::string message;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&message](int, const void* msg, size_t len, int) -> int {
-            std::cerr << "api->send " << (const char *)msg << " " << len << std::endl;
             if (msg != nullptr && len != 0) {
                 message.assign(reinterpret_cast<const char*>(msg), len);
                 return 0;
@@ -58,20 +55,16 @@ TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
             return -1;
         });
 
-    std::cerr << "serverConnection" << std::endl;
     // Act
     serverconnection serverConnection(Socket(1), 1, "/", "127.0.0.1");
 
-    std::cerr << "Check assert" << std::endl;
     // Assert
     ASSERT_EQ(
         "220 FTP server ready.\n",
         message);
-    std::cerr << "Connection to client" << std::endl;
     ASSERT_EQ(
         "Connection to client '127.0.0.1' established\n",
         out.str());
-    std::cerr << "EXIT" << std::endl;
 }
 
 TEST_F(ServerConnectionTest, send_502_code_for_unimplemented_command)

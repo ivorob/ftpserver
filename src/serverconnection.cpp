@@ -5,12 +5,12 @@
 
 // Constructor
 serverconnection::serverconnection(Socket currentSocket, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) 
-    : fo(std::make_shared<fileoperator>(dir))
+    : fo(std::make_shared<fileoperator>(defaultDir))
     , currentSocket(std::move(currentSocket))
     , ftpCommandFactory(makeContext())
     , connectionId(connId)
-    , dir(defaultDir)
-    , hostAddress(hostId)
+    , dir(std::move(defaultDir))
+    , hostAddress(std::move(hostId))
     , commandOffset(commandOffset)
     , closureRequested(false)
     , uploadCommand(false)

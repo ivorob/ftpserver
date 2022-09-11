@@ -27,6 +27,16 @@ public:
     bool getCloseRequestStatus() const;
     unsigned int getConnectionId() const;
 private:
+    FTP::Context makeContext();
+
+    void shutdown();
+
+    void sendToClient(const char* response, unsigned long length);
+    void sendToClient(std::string response);
+    bool commandEquals(std::string a, std::string b);
+    std::string filterOutBlanks(std::string inString);
+    static void getAllParametersAfter(std::vector<std::string> parameterVector, unsigned int currentParameter, std::string& theRest);
+private:
     std::shared_ptr<fileoperator> fo; // For browsing, writing and reading
     Socket currentSocket;
     FTP::CommandFactory ftpCommandFactory;
@@ -38,16 +48,6 @@ private:
     std::string hostAddress;
     bool uploadCommand;
     bool downloadCommand;
-private:
-    FTP::Context makeContext();
-
-    void shutdown();
-
-    void sendToClient(const char* response, unsigned long length);
-    void sendToClient(std::string response);
-    bool commandEquals(std::string a, std::string b);
-    std::string filterOutBlanks(std::string inString);
-    static void getAllParametersAfter(std::vector<std::string> parameterVector, unsigned int currentParameter, std::string& theRest);
     unsigned short commandOffset;
     unsigned long receivedPart;
 };

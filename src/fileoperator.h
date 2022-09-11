@@ -60,12 +60,14 @@ public:
     std::vector<std::string> getListOfDeletedDirectories();
     bool dirIsBelowServerRoot(std::string dirName);
 private:
-    std::vector<std::string> deletedDirectories;
-    std::vector<std::string> deletedFiles;
     void getValidDir(std::string &dirName);
     void getValidFile(std::string &fileName);
     void stripServerRootString(std::string &dirOrFileName);
+private:
+    static void IntToString(int i, std::string &res);
+private:
+    std::vector<std::string> deletedDirectories;
+    std::vector<std::string> deletedFiles;
     std::ofstream currentOpenFile;
     std::list<std::string> completePath; // The path from server root dir upwards to the current working dir, each list element containing one dir
-    static void IntToString(int i, std::string &res);
 };
