@@ -56,7 +56,7 @@ TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
         });
 
     // Act
-    serverconnection serverConnection(1, 1, "/", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "/", "127.0.0.1");
 
     // Assert
     ASSERT_EQ(
@@ -93,7 +93,7 @@ TEST_F(ServerConnectionTest, send_502_code_for_unimplemented_command)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
 
-    serverconnection serverConnection(1, 1, "/", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "/", "127.0.0.1");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
@@ -136,7 +136,7 @@ TEST_F(ServerConnectionTest, user_command_is_processed_successfully)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
 
-    serverconnection serverConnection(1, 1, "/", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "/", "127.0.0.1");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
@@ -179,7 +179,7 @@ TEST_F(ServerConnectionTest, current_directory_command_is_processed_successfully
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
 
-    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "./", "127.0.0.1");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
@@ -226,7 +226,7 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
     EXPECT_CALL(*impl, closedir)
         .WillRepeatedly(Return(0));
 
-    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "./", "127.0.0.1");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
@@ -271,7 +271,7 @@ TEST_F(ServerConnectionTest, bye_command_is_processed_successfully)
             return 0;
         });
 
-    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "./", "127.0.0.1");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);
@@ -319,7 +319,7 @@ TEST_F(ServerConnectionTest, quit_command_is_processed_successfully)
             return 0;
         });
 
-    serverconnection serverConnection(1, 1, "./", "127.0.0.1");
+    serverconnection serverConnection(Socket(1), 1, "./", "127.0.0.1");
 
     std::ostringstream out;
     ScopedStreamRedirector streamRedirector(std::cout, out);

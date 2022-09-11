@@ -5,12 +5,12 @@
 class Socket {
 public:
     Socket() = default;
-    Socket(int sockfd);
+    explicit Socket(int sockfd);
     Socket(const Socket&) = delete;
     Socket& operator=(const Socket&) = delete;
     Socket(Socket&&);
     Socket& operator=(Socket&&);
-    ~Socket();
+    virtual ~Socket();
 
     int allowReuse();
     void bind(struct sockaddr_in& addr);
