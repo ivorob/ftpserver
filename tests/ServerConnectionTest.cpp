@@ -7,6 +7,7 @@
 #include "MockOSApiImpl.h"
 #include "ScopedStreamRedirector.h"
 #include "BrowseUtils.h"
+#include "OSUtils.h"
 
 namespace fs = std::filesystem;
 
@@ -338,4 +339,48 @@ TEST_F(ServerConnectionTest, quit_command_is_processed_successfully)
         out.str());
     ASSERT_FALSE(closeStatusBeforeProcessCommand);
     ASSERT_TRUE(serverConnection.getCloseRequestStatus());
+}
+
+TEST_F(ServerConnectionTest, syst_command_is_processed_successfully)
+{
+    // Arrange
+    using ::testing::Return;
+
+    auto impl = makeImpl();
+
+    EXPECT_CALL(*impl, close)
+        .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, recv)
+        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+            std::string command = "SYST\n";
+            strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
+            return static_cast<int>(command.size());
+        });
+    std::string response;
+    EXPECT_CALL(*impl, send)
+        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+            response.clear();
+            if (msg == nullptr || len == 0) {
+                return -1;
+            }
+
+            response.assign(reinterpret_cast<const char*>(msg), len);
+            return 0;
+        });
+
+    serverconnection serverConnection(Socket(1), 1, "./", "127.0.0.1");
+
+    std::ostringstream out;
+    ScopedStreamRedirector streamRedirector(std::cout, out);
+
+    // Act
+    serverConnection.respondToQuery();
+
+    // Assert
+    ASSERT_EQ(
+        "215 " + OSUtils::getOSName() + " system type\n",
+        response);
+    ASSERT_EQ(
+        "Connection 1: Get of system type requested\n",
+        out.str());
 }

@@ -41,6 +41,7 @@ Available commands in the program that the client can issue and the running ftps
 | Command | Explanation |
 | --- | --- |
 | user `username` | login as user `username`, dummy implemented |
+| syst | get system type without system version |
 | browse | lists all files and directories in the current server working directory |
 | ls `dir` | lists all files and directories in the specified directory |
 | download `file` | sends the binary data of the specified file over the connection the command was received |

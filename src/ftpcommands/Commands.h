@@ -5,3 +5,4 @@
 #include "QuitCommand.h"
 #include "CurrentDirectoryCommand.h"
 #include "ChangeDirectoryCommand.h"
+#include "SystemTypeCommand.h"

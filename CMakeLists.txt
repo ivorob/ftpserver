@@ -27,6 +27,7 @@ SET (SOURCES
         ${SRC_DIR}/OSApiImpl.cpp
         ${SRC_DIR}/Socket.cpp
         ${SRC_DIR}/FTPCommandFactory.cpp
+        ${SRC_DIR}/OSUtils.cpp
         # commands
         ${SRC_DIR}/FTPCommand.cpp
         ${SRC_DIR}/ftpcommands/DefaultCommand.cpp
@@ -34,6 +35,7 @@ SET (SOURCES
         ${SRC_DIR}/ftpcommands/QuitCommand.cpp
         ${SRC_DIR}/ftpcommands/CurrentDirectoryCommand.cpp
         ${SRC_DIR}/ftpcommands/ChangeDirectoryCommand.cpp
+        ${SRC_DIR}/ftpcommands/SystemTypeCommand.cpp
     )
 
 SET (HEADERS
@@ -45,15 +47,17 @@ SET (HEADERS
         ${INCLUDE_DIR}/OSApiImpl.h
         ${INCLUDE_DIR}/Socket.h
         ${INCLUDE_DIR}/FTPCommandFactory.h
+        ${INCLUDE_DIR}/OSUtils.h
         # commands
-        ${SRC_DIR}/FTPContext.h
-        ${SRC_DIR}/FTPCommand.h
-        ${SRC_DIR}/ftpcommands/DefaultCommand.h
-        ${SRC_DIR}/ftpcommands/UserCommand.h
-        ${SRC_DIR}/ftpcommands/Commands.h
-        ${SRC_DIR}/ftpcommands/QuitCommand.h
-        ${SRC_DIR}/ftpcommands/CurrentDirectoryCommand.h
-        ${SRC_DIR}/ftpcommands/ChangeDirectoryCommand.h
+        ${INCLUDE_DIR}/FTPContext.h
+        ${INCLUDE_DIR}/FTPCommand.h
+        ${INCLUDE_DIR}/ftpcommands/DefaultCommand.h
+        ${INCLUDE_DIR}/ftpcommands/UserCommand.h
+        ${INCLUDE_DIR}/ftpcommands/Commands.h
+        ${INCLUDE_DIR}/ftpcommands/QuitCommand.h
+        ${INCLUDE_DIR}/ftpcommands/CurrentDirectoryCommand.h
+        ${INCLUDE_DIR}/ftpcommands/ChangeDirectoryCommand.h
+        ${INCLUDE_DIR}/ftpcommands/SystemTypeCommand.h
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})

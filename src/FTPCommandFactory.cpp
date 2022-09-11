@@ -22,6 +22,7 @@ std::unordered_map<std::string, std::function<FTP::CommandHolder(FTP::Context&&)
     { "QUIT",   createCommand<FTP::QuitCommand> },
     { "PWD",    createCommand<FTP::CurrentDirectoryCommand> },
     { "CWD",    createCommand<FTP::ChangeDirectoryCommand> },
+    { "SYST",   createCommand<FTP::SystemTypeCommand> },
 };
 
 }
