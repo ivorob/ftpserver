@@ -18,8 +18,7 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
     , receivedPart(0) {
 
     // Send hello
-    std::string data = "220 FTP server ready.\n";
-    sendToClient(data.c_str(), data.size());
+    sendToClient("220 FTP server ready.\n");
     std::cout << "Connection to client '" << this->hostAddress << "' established" << std::endl;
 }
 

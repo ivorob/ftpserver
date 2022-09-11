@@ -47,7 +47,7 @@ TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
     std::string message;
     EXPECT_CALL(*impl, send)
         .WillRepeatedly([&message](int, const void* msg, size_t len, int) -> int {
-            if (len != 0) {
+            if (msg != nullptr && len != 0) {
                 message.assign(reinterpret_cast<const char*>(msg), len);
                 return 0;
             }
