@@ -1,8 +1,6 @@
 #pragma once
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <dirent.h>
+#include "os.h"
 
 class AbstractOSApi {
 public:

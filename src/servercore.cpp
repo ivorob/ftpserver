@@ -1,5 +1,3 @@
-#include <sys/socket.h>
-
 #include "servercore.h"
 #include "serverconnection.h"
 #include "OSApi.h"

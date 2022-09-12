@@ -1,18 +1,10 @@
 #pragma once
 
-#include "serverconnection.h"
-#include <cstdio>
-#include <cstdlib>
 #include <string>
-#include <iostream>
-#include <sstream>
-#include <sys/types.h>
-#include <sys/fcntl.h>
-#include <sys/param.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
 #include <list>
+#include <memory>
 
+#include "serverconnection.h"
 #include "Socket.h"
 
 class servercore {

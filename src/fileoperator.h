@@ -8,14 +8,9 @@
 #include <sstream>
 #include <memory>
 #include <list>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <locale.h>
-#include <pwd.h>
-#include <grp.h>
 #include <stdint.h>
+
+#include "os.h"
 
 // Buffer size
 #define BUFFER_SIZE 4096

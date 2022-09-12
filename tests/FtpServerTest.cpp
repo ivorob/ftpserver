@@ -85,6 +85,10 @@ TEST_F(FtpServerTest, error_during_setsockopt_shutdown_server)
     EXPECT_CALL(*impl, close)
         .Times(1)
         .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, getsockname)
+        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+            return 0;
+        });
 
     // Act
     servercore ftpServer(4242, "/");
@@ -114,6 +118,10 @@ TEST_F(FtpServerTest, error_during_bind_shutdown_server)
     EXPECT_CALL(*impl, close)
         .Times(1)
         .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, getsockname)
+        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+            return 0;
+        });
 
     // Act
     servercore ftpServer(4242, "/");
@@ -145,6 +153,10 @@ TEST_F(FtpServerTest, error_during_listen_shutdown_server)
     EXPECT_CALL(*impl, close)
         .Times(1)
         .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, getsockname)
+        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+            return 0;
+        });
 
     // Act
     servercore ftpServer(4242, "/");
