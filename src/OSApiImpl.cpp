@@ -1,8 +1,9 @@
-#include <unistd.h>
-#include <sys/stat.h>
 #include <stdio.h>
+#include <filesystem>
 
 #include "OSApiImpl.h"
+
+namespace fs = std::filesystem;
 
 int OSApiImpl::socket(int domain, int type, int protocol)
 {
@@ -63,30 +64,49 @@ int OSApiImpl::close(int fd)
 
 int OSApiImpl::rmdir(const char* path)
 {
-    return ::rmdir(path);
+    if (path != nullptr) {
+        std::error_code errorCode;
+        fs::remove_all(path, errorCode);
+        return errorCode.value() == 0;
+    }
+
+    return -1;
 }
 
 int OSApiImpl::chdir(const char* path)
 {
-    return ::chdir(path);
+    if (path != nullptr) {
+        std::error_code errorCode;
+        fs::current_path(path, errorCode);
+        return errorCode.value() == 0;
+    }
+
+    return -1;
 }
 
-DIR* OSApiImpl::opendir(const char* filename)
+bool OSApiImpl::canOpenDirectory(const std::string& path) const
 {
-    return ::opendir(filename);
-}
+    std::error_code errorCode;
+    if (fs::is_directory(path, errorCode)) {
+        auto oldPath = fs::current_path();
 
-struct dirent* OSApiImpl::readdir(DIR* dirp)
-{
-    return ::readdir(dirp);
-}
+        fs::current_path(path, errorCode);
+        bool isChanged = errorCode.value() == 0;
+        fs::current_path(oldPath, errorCode);
+        return isChanged;
+    }
 
-int OSApiImpl::closedir(DIR* dirp)
-{
-    return ::closedir(dirp);
+    return false;
 }
 
 int OSApiImpl::mkdir(const char* path, mode_t mode)
 {
-    return ::mkdir(path, mode);
+    //TODO: use mode parameter
+    if (path != nullptr) {
+        std::error_code errorCode;
+        fs::create_directories(path, errorCode);
+        return errorCode.value() == 0;
+    }
+
+    return -1;
 }

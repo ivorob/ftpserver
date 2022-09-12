@@ -20,10 +20,7 @@ public:
     MOCK_METHOD1(close, int(int));
     MOCK_METHOD1(rmdir, int(const char*));
     MOCK_METHOD1(chdir, int(const char*));
-
-    MOCK_METHOD1(opendir, DIR*(const char*));
-    MOCK_METHOD1(readdir, struct dirent*(DIR*));
-    MOCK_METHOD1(closedir, int(DIR*));
+    MOCK_CONST_METHOD1(canOpenDirectory, bool(const std::string&));
 
     MOCK_METHOD2(mkdir, int(const char*, mode_t));
 };

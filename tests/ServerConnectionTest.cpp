@@ -6,7 +6,6 @@
 #include "FakeOSApi.h"
 #include "MockOSApiImpl.h"
 #include "ScopedStreamRedirector.h"
-#include "BrowseUtils.h"
 #include "OSUtils.h"
 
 namespace fs = std::filesystem;
@@ -24,16 +23,6 @@ std::shared_ptr<MockOSApiImpl> makeImpl() {
     auto impl = std::make_shared<MockOSApiImpl>();
     setImpl(impl);
     return impl;
-}
-
-std::vector<struct dirent> makeTestDir() {
-    std::vector<struct dirent> testDir;
-    testDir.push_back(BrowseUtils::makeDirEntry(".", DT_DIR));
-    testDir.push_back(BrowseUtils::makeDirEntry("..", DT_DIR));
-    testDir.push_back(BrowseUtils::makeDirEntry("testDir", DT_DIR));
-    testDir.push_back(BrowseUtils::makeDirEntry("file1", DT_REG));
-    testDir.push_back(BrowseUtils::makeDirEntry("file2", DT_REG));
-    return testDir;
 }
 
 }
@@ -238,10 +227,8 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
         });
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
-    EXPECT_CALL(*impl, opendir)
-        .WillRepeatedly(Return(reinterpret_cast<DIR*>(0x12345678)));
-    EXPECT_CALL(*impl, closedir)
-        .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, canOpenDirectory)
+        .WillRepeatedly(Return(true));
     EXPECT_CALL(*impl, getsockname)
         .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
             return 0;

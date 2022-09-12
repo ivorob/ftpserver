@@ -85,8 +85,8 @@ TEST_F(ChangeDirectoryTest, cannot_change_directory_to_invalid_directory)
 
     using ::testing::Return;
     auto impl = makeImpl();
-    EXPECT_CALL(*impl, opendir)
-        .WillRepeatedly(Return(nullptr));
+    EXPECT_CALL(*impl, canOpenDirectory)
+        .WillRepeatedly(Return(false));
 
     // Act
     bool actualResult = fileOperator.changeDir("invalidDirectory");
@@ -103,40 +103,11 @@ TEST_F(ChangeDirectoryTest, directory_is_changed_successfully)
     using ::testing::Return;
     auto impl = makeImpl();
 
-    EXPECT_CALL(*impl, opendir)
-        .WillRepeatedly(Return(reinterpret_cast<DIR*>(0x123456)));
-    EXPECT_CALL(*impl, closedir)
-        .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, canOpenDirectory)
+        .WillRepeatedly(Return(true));
 
     // Act
     bool actualResult = fileOperator.changeDir("validDirectory");
-
-    // Assert
-    ASSERT_FALSE(actualResult);
-}
-
-TEST_F(ChangeDirectoryTest, stric_mode_remove_slashes_from_path)
-{
-    // Arrange
-    fileoperator fileOperator("/");
-
-    using ::testing::Return;
-    using ::testing::_;
-    auto impl = makeImpl();
-
-    EXPECT_CALL(*impl, opendir)
-        .WillRepeatedly([](const char* path) -> DIR* {
-            if (path == nullptr || std::string(path) != "......testDirectory....new/") {
-                return nullptr;
-            }
-
-            return reinterpret_cast<DIR*>(0x12345678);
-        });
-    EXPECT_CALL(*impl, closedir)
-        .WillRepeatedly(Return(0));
-
-    // Act
-    bool actualResult = fileOperator.changeDir("../../../testDirectory/../../new", true);
 
     // Assert
     ASSERT_FALSE(actualResult);
