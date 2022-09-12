@@ -179,6 +179,10 @@ TEST_F(FtpServerTest, server_is_started_successfully)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, select)
         .WillRepeatedly(Return(-1));
+    EXPECT_CALL(*impl, getsockname)
+        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+            return 0;
+        });
 
     // Act
     servercore ftpServer(4242, "/");

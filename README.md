@@ -42,6 +42,7 @@ Available commands in the program that the client can issue and the running ftps
 | --- | --- |
 | user `username` | login as user `username`, dummy implemented |
 | syst | get system type without system version |
+| pasv | get data connection port, dummy implementation without data connection | 
 | pwd | prints the current working directory on the server |
 | cwd `dir` | changes the current working directory on the server to the specified one |
 | bye | terminates the connection the command is received on |

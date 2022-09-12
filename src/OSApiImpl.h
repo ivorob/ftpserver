@@ -7,6 +7,7 @@ public:
     int socket(int domain, int type, int protocol) override;
     int setsockopt(int s, int level, int optname, 
         void* optval, socklen_t optlen) override;
+    int getsockname(int s, struct sockaddr* name, socklen_t* namelen) override;
     ssize_t recv(int s, void* buf, size_t len, int flags) override;
     ssize_t send(int s, const void* msg, size_t len, int flags) override;
     int bind(int s, const struct sockaddr* addr, socklen_t addrlen) override;

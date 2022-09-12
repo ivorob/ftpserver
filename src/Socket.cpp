@@ -9,6 +9,14 @@ Socket::Socket(int sockfd)
     if (this->sockfd == -1) {
         throw std::runtime_error("socket() failed");
     }
+
+    socklen_t namelen = sizeof(address);
+    if (api()->getsockname(this->sockfd, 
+            reinterpret_cast<struct sockaddr*>(&address), 
+            &namelen) == -1) {
+        closeSocket();
+        throw std::runtime_error("Cannot get socket address");
+    }
 }
 
 Socket::~Socket()
@@ -26,8 +34,10 @@ void Socket::closeSocket()
 
 Socket::Socket(Socket&& other)
     : sockfd(other.sockfd)
+    , address(other.address)
 {
     other.sockfd = -1;
+    other.address = {0};
 }
 
 Socket& Socket::operator=(Socket&& other)
@@ -36,6 +46,9 @@ Socket& Socket::operator=(Socket&& other)
         closeSocket();
 
         std::swap(this->sockfd, other.sockfd);
+
+        this->address = {0};
+        std::swap(this->address, other.address);
     }
 
     return *this;
@@ -66,6 +79,11 @@ void Socket::listen(int backlog)
     if (api()->listen(this->sockfd, backlog) == -1) {
         throw std::runtime_error("listen () failed");
     }
+}
+
+struct sockaddr_in Socket::getAddress() const
+{
+    return this->address;
 }
 
 Socket Socket::accept()

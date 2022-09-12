@@ -15,6 +15,11 @@ int OSApiImpl::setsockopt(int s, int level, int optname,
     return ::setsockopt(s, level, optname, optval, optlen);
 }
 
+int OSApiImpl::getsockname(int s, struct sockaddr* name, socklen_t* namelen)
+{
+    return ::getsockname(s, name, namelen);
+}
+
 ssize_t OSApiImpl::recv(int s, void* buf, size_t len, int flags)
 {
     return ::recv(s, buf, len, flags);

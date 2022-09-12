@@ -25,12 +25,17 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
 FTP::Context serverconnection::makeContext() {
     FTP::Context ftpContext;
     ftpContext.shutdownConnection = std::bind(&serverconnection::shutdown, this);
+    ftpContext.obtainDataConnection = std::bind(&serverconnection::obtainDataConnection, this);
     ftpContext.fileOperator = this->fo;
     return ftpContext;
 }
 
 void serverconnection::shutdown() {
     this->closureRequested = true;
+}
+
+struct sockaddr_in serverconnection::obtainDataConnection() {
+    return currentSocket.getAddress();
 }
 
 // Destructor, clean up all the mess

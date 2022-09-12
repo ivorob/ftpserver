@@ -30,6 +30,7 @@ private:
     FTP::Context makeContext();
 
     void shutdown();
+    struct sockaddr_in obtainDataConnection();
 
     void sendToClient(const char* response, unsigned long length);
     void sendToClient(std::string response);

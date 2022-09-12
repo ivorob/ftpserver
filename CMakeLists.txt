@@ -36,6 +36,7 @@ SET (SOURCES
         ${SRC_DIR}/ftpcommands/CurrentDirectoryCommand.cpp
         ${SRC_DIR}/ftpcommands/ChangeDirectoryCommand.cpp
         ${SRC_DIR}/ftpcommands/SystemTypeCommand.cpp
+        ${SRC_DIR}/ftpcommands/PassiveModeCommand.cpp
     )
 
 SET (HEADERS
@@ -58,6 +59,7 @@ SET (HEADERS
         ${INCLUDE_DIR}/ftpcommands/CurrentDirectoryCommand.h
         ${INCLUDE_DIR}/ftpcommands/ChangeDirectoryCommand.h
         ${INCLUDE_DIR}/ftpcommands/SystemTypeCommand.h
+        ${INCLUDE_DIR}/ftpcommands/PassiveModeCommand.h
     )
 
 ADD_EXECUTABLE (${PROJECT_NAME} ${SOURCES} ${HEADERS})

@@ -2,6 +2,7 @@
 
 #include <functional>
 #include <memory>
+#include <netinet/in.h>
 
 #include "fileoperator.h"
 
@@ -11,6 +12,7 @@ class Context {
 public:
     std::function<void()> shutdownConnection;
     std::function<std::string()> getCommand;
+    std::function<struct sockaddr_in()> obtainDataConnection;
 
     std::weak_ptr<fileoperator> fileOperator;
 };

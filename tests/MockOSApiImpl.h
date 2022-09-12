@@ -8,6 +8,7 @@ class MockOSApiImpl : public AbstractOSApi {
 public:
     MOCK_METHOD3(socket, int(int,int,int));
     MOCK_METHOD5(setsockopt, int(int, int, int, void*, socklen_t));
+    MOCK_METHOD3(getsockname, int(int,struct sockaddr*, socklen_t*));
     MOCK_METHOD4(recv, ssize_t(int, void*, size_t, int));
     MOCK_METHOD4(send, ssize_t(int, const void*, size_t, int));
     MOCK_METHOD3(bind, int(int, const struct sockaddr*, socklen_t));
