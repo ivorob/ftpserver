@@ -1,6 +1,6 @@
 #pragma once
 
-#include <netinet/in.h>
+#include "os.h"
 
 class Socket {
 public:
@@ -13,6 +13,7 @@ public:
     virtual ~Socket();
 
     int allowReuse();
+    int makeNonBlocking();
     void bind(struct sockaddr_in& addr);
     void listen(int backlog);
 

@@ -65,6 +65,32 @@ int Socket::allowReuse()
         &reuseAllowed, sizeof(reuseAllowed));
 }
 
+int Socket::makeNonBlocking()
+{
+    if (this->sockfd < 0) {
+        return -1;
+    }
+
+#if defined(_WIN32) || defined(_WIN64)
+    unsigned long mode = 0;
+    if (ioctlsocket(this->sockfd, FIONBIO, &mode) != 0) {
+        throw std::runtime_error("Error setting socket to non-blocking");
+    }
+#else
+    int opts = fcntl(this->sockfd, F_GETFL, 0);
+    if (opts < 0) {
+        throw std::runtime_error("Error getting socket flags");
+    }
+
+    opts = (opts | O_NONBLOCK);
+    if (fcntl(this->sockfd, F_SETFL, opts) < 0) {
+        throw std::runtime_error("Error setting socket to non-blocking");
+    }
+#endif
+
+    return 0;
+}
+
 void Socket::bind(struct sockaddr_in& addr)
 {
     if (api()->bind(this->sockfd, 

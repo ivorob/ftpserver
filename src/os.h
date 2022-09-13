@@ -12,7 +12,7 @@ using socklen_t = int;
 #include <sys/socket.h>
 #include <sys/stat.h>
 #include <netinet/in.h>
-#include <dirent.h>
 #include <grp.h>
 #include <pwd.h>
+#include <fcntl.h>
 #endif

@@ -2,7 +2,6 @@
 
 #include <functional>
 #include <memory>
-#include <netinet/in.h>
 
 #include "fileoperator.h"
 

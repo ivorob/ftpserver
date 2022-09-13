@@ -4,7 +4,6 @@
 #include <cstdlib>
 #include <string>
 #include <iostream>
-#include <sys/fcntl.h>
 #include <algorithm> // for transform command
 #include <memory>
 

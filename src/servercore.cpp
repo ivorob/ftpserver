@@ -65,7 +65,7 @@ int servercore::handleNewConnection() {
         Socket newSocket = this->listenSocket.accept();
 
         // Gets the socket fd flags and add the non-blocking flag to the sfd
-        this->setNonBlocking(newSocket.native());
+        newSocket.makeNonBlocking();
 
         // Get the client IP address
         char ipstr[INET6_ADDRSTRLEN];
@@ -137,22 +137,6 @@ int servercore::start() {
     return (EXIT_SUCCESS);
 }
 
-// Sets the given socket to non-blocking mode
-void servercore::setNonBlocking(int sock) {
-    this->sflags = fcntl(sock, F_GETFL); // Get socket flags
-    int opts = fcntl(sock,F_GETFL, 0);
-    if (opts < 0) {
-        std::cerr << "Error getting socket flags" << std::endl;
-        return;
-    }
-
-    opts = (opts | O_NONBLOCK);
-    if (fcntl(sock,F_SETFL,opts) < 0) {
-        std::cerr << "Error setting socket to non-blocking" << std::endl;
-        return;
-    }
-}
-
 // Initialization of sockets / socket list with options and error checking
 void servercore::initSockets(int port) {
     // PF_INET: domain, Internet; SOCK_STREAM: datastream, TCP / SOCK_DGRAM = UDP => WARNING, this can change the byte order!; for 3rd parameter==0: TCP preferred
@@ -161,7 +145,7 @@ void servercore::initSockets(int port) {
         if (this->listenSocket.allowReuse() < 0) {
             throw std::runtime_error("setsockopt() failed");
         }
-        this->setNonBlocking(this->listenSocket.native());
+        this->listenSocket.makeNonBlocking();
 
         this->addr.sin_family = AF_INET; // PF_INET;
         this->addr.sin_port = htons(port);

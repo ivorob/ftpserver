@@ -15,7 +15,6 @@ public:
 private:
     int start();
     void initSockets(int port);
-    void setNonBlocking(int sock);
     void buildSelectList();
     void readSockets();
     int handleNewConnection();
