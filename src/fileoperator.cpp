@@ -85,7 +85,9 @@ bool fileoperator::createDirectory(std::string &dirName, bool strict) {
         return true;
     }
 
+#if !defined(_WIN32) && !defined(_WIN64)
     umask(0);
+#endif
     return ((api()->mkdir(this->getCurrentWorkingDir().append(dirName).c_str(), 0) == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
