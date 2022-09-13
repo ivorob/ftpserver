@@ -22,6 +22,6 @@ public:
     MOCK_METHOD1(chdir, int(const char*));
     MOCK_CONST_METHOD1(canOpenDirectory, bool(const std::string&));
 
-    MOCK_METHOD2(mkdir, int(const char*, mode_t));
+    MOCK_METHOD2(mkdir, int(const char*, uint16_t));
 };
 
