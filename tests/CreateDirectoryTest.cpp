@@ -46,7 +46,7 @@ TEST_F(CreateDirectoryTest, cannot_create_directory_if_it_exists)
 
     auto impl = makeImpl();
     EXPECT_CALL(*impl, mkdir)
-        .WillRepeatedly([](const char* path, mode_t) -> int {
+        .WillRepeatedly([](const char* path, uint16_t) -> int {
             if (std::string(path) == "existingDirectory") {
                 return -1;
             }
@@ -70,7 +70,7 @@ TEST_F(CreateDirectoryTest, directory_is_created_successfully)
 
     auto impl = makeImpl();
     EXPECT_CALL(*impl, mkdir)
-        .WillRepeatedly([](const char* path, mode_t) -> int {
+        .WillRepeatedly([](const char* path, uint16_t) -> int {
             if (std::string(path) == "existingDirectory") {
                 return -1;
             }
