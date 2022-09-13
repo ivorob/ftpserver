@@ -5,6 +5,14 @@
 
 namespace fs = std::filesystem;
 
+OSApiImpl::OSApiImpl()
+{
+#if defined(_WIN32) || defined(_WIN64)
+    WSAData data;
+    WSAStartup(MAKEWORD(2, 2), &data);
+#endif
+}
+
 int OSApiImpl::socket(int domain, int type, int protocol)
 {
     return ::socket(domain, type, protocol);

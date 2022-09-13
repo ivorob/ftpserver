@@ -4,6 +4,8 @@
 
 class OSApiImpl : public AbstractOSApi {
 public:
+    OSApiImpl();
+
     int socket(int domain, int type, int protocol) override;
     int setsockopt(int s, int level, int optname, 
         void* optval, socklen_t optlen) override;
