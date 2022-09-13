@@ -3,6 +3,7 @@
 #if defined(_WIN32) || defined(_WIN64)
 #include <winsock2.h>
 #include <windows.h>
+#include <ws2tcpip.h>
 
 using socklen_t = int;
 using ssize_t = int;
