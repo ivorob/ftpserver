@@ -20,10 +20,7 @@ public:
     int close(int fd) override;
     int rmdir(const char* path) override;
     int chdir(const char* path) override;
-
-    DIR *opendir(const char* filename) override;
-    struct dirent* readdir(DIR* dirp) override;
-    int closedir(DIR* dirp) override;
+    bool canOpenDirectory(const std::string& path) const override;
 
     int mkdir(const char* path, mode_t mode) override;
 };

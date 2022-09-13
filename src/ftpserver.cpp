@@ -1,8 +1,12 @@
 #include <cstdlib>
 #include <iostream>
 #include <memory>
+#include <filesystem>
 
 #include "servercore.h"
+#include "OSApi.h"
+
+namespace fs = std::filesystem;
 
 /**
  * This is the main program entry point
@@ -25,9 +29,9 @@ int main(int argc, char** argv) {
                 // TODO: replace it by std::filesystem
                 auto db = std::make_unique<fileoperator>(dir);
                 // Test if dir exists
-                if (db->dirCanBeOpenend(argv[1])) {
+                if (api()->canOpenDirectory(argv[1])) {
                     dir = argv[1]; // set default server directory
-                    db->changeDir(dir, false); // Assume the server side is allowed to change any directory as server root (thus the false for no strict mode)
+                    fs::current_path(dir);
                 } else {
                     std::cout << "Invalid path specified ('" << argv[1] << "'), falling back to '" << dir << "'" << std::endl;
                 }

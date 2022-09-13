@@ -1,8 +1,7 @@
 #pragma once
 
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <dirent.h>
+#include <string>
+#include "os.h"
 
 class AbstractOSApi {
 public:
@@ -24,10 +23,7 @@ public:
     virtual int close(int fd) = 0;
     virtual int rmdir(const char* path) = 0;
     virtual int chdir(const char* path) = 0;
-
-    virtual DIR *opendir(const char* filename) = 0;
-    virtual struct dirent* readdir(DIR* dirp) = 0;
-    virtual int closedir(DIR* dirp) = 0;
+    virtual bool canOpenDirectory(const std::string& path) const = 0;
 
     virtual int mkdir(const char* path, mode_t mode) = 0;
 };

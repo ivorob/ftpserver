@@ -8,14 +8,9 @@
 #include <sstream>
 #include <memory>
 #include <list>
-#include <sys/types.h>
-#include <sys/stat.h>
-#include <fcntl.h>
-#include <dirent.h>
-#include <locale.h>
-#include <pwd.h>
-#include <grp.h>
 #include <stdint.h>
+
+#include "os.h"
 
 // Buffer size
 #define BUFFER_SIZE 4096
@@ -47,13 +42,8 @@ public:
     std::string getCurrentWorkingDir(bool showRootPath = true);
     bool createFile(std::string &fileName, bool strict = true);
     bool createDirectory(std::string &dirName, bool strict = true);
-    bool deleteDirectory(std::string dirName, bool cancel = false, std::string pathToDir = "");
     bool deleteFile(std::string fileName, bool strict = true);
-    void browse(std::string dir, std::vector<std::string> &directories, std::vector<std::string> &files, bool strict = true);
-    bool dirCanBeOpenend(std::string dir);
     std::string getParentDir();
-    unsigned long getDirSize(std::string dirName);
-    std::vector<std::string> getStats(std::string fileName, struct stat Status);
     void clearListOfDeletedFiles();
     void clearListOfDeletedDirectories();
     std::vector<std::string> getListOfDeletedFiles();
