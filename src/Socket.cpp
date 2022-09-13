@@ -6,7 +6,7 @@
 Socket::Socket(int sockfd)
     : sockfd(sockfd)
 {
-    if (this->sockfd == -1) {
+    if (this->sockfd == INVALID_SOCKET) {
         throw std::runtime_error("socket() failed");
     }
 
@@ -26,9 +26,9 @@ Socket::~Socket()
 
 void Socket::closeSocket()
 {
-    if (this->sockfd >= 0) {
+    if (this->sockfd != INVALID_SOCKET) {
         api()->close(this->sockfd);
-        this->sockfd = -1;
+        this->sockfd = INVALID_SOCKET;
     }
 }
 
@@ -36,7 +36,7 @@ Socket::Socket(Socket&& other)
     : sockfd(other.sockfd)
     , address(other.address)
 {
-    other.sockfd = -1;
+    other.sockfd = INVALID_SOCKET;
     other.address = {0};
 }
 

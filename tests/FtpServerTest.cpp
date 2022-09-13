@@ -34,7 +34,7 @@ TEST_F(FtpServerTest, error_during_changing_directory_prints_errors)
     EXPECT_CALL(*impl, chdir)
         .WillRepeatedly(Return(-1));
     EXPECT_CALL(*impl, socket)
-        .WillRepeatedly(Return(-1));
+        .WillRepeatedly(Return(INVALID_SOCKET));
 
     // Act
     servercore ftpServer(4242, "/");
@@ -57,7 +57,7 @@ TEST_F(FtpServerTest, error_during_allocating_socket_shutdown_server)
     EXPECT_CALL(*impl, chdir)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, socket)
-        .WillRepeatedly(Return(-1));
+        .WillRepeatedly(Return(INVALID_SOCKET));
 
     // Act
     servercore ftpServer(4242, "/");

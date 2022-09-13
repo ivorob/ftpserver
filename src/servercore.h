@@ -9,7 +9,7 @@
 
 class servercore {
 public:
-    servercore(uint port,std::string dir, unsigned short commandOffset = 1);
+    servercore(uint16_t port,std::string dir, unsigned short commandOffset = 1);
     ~servercore();
 
 private:

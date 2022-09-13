@@ -86,7 +86,7 @@ bool fileoperator::createDirectory(std::string &dirName, bool strict) {
     }
 
     umask(0);
-    return ((api()->mkdir(this->getCurrentWorkingDir().append(dirName).c_str(), S_IRWXU | S_IRWXG | S_IRWXO) == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
+    return ((api()->mkdir(this->getCurrentWorkingDir().append(dirName).c_str(), 0) == 0) ? EXIT_SUCCESS : EXIT_FAILURE);
 }
 
 // Read a block from the open file

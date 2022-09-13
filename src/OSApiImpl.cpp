@@ -99,7 +99,7 @@ bool OSApiImpl::canOpenDirectory(const std::string& path) const
     return false;
 }
 
-int OSApiImpl::mkdir(const char* path, mode_t mode)
+int OSApiImpl::mkdir(const char* path, uint16_t mode)
 {
     //TODO: use mode parameter
     if (path != nullptr) {

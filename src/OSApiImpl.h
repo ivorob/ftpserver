@@ -22,5 +22,5 @@ public:
     int chdir(const char* path) override;
     bool canOpenDirectory(const std::string& path) const override;
 
-    int mkdir(const char* path, mode_t mode) override;
+    int mkdir(const char* path, uint16_t mode) override;
 };

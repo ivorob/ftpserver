@@ -2,6 +2,7 @@
 
 #if defined(_WIN32) || defined(_WIN64)
 #include <windows.h>
+#include <winsock2.h>
 
 using close = closesocket;
 using socklen_t = int;
@@ -15,4 +16,7 @@ using socklen_t = int;
 #include <grp.h>
 #include <pwd.h>
 #include <fcntl.h>
+
+#define SOCKET      int
+#define INVALID_SOCKET (-1)
 #endif

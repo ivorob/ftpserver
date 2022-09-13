@@ -25,6 +25,6 @@ public:
 private:
     void closeSocket();
 private:
-    int sockfd = -1;
+    SOCKET sockfd = INVALID_SOCKET;
     struct sockaddr_in address = {0};
 };

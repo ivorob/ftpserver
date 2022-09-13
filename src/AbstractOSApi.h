@@ -25,5 +25,5 @@ public:
     virtual int chdir(const char* path) = 0;
     virtual bool canOpenDirectory(const std::string& path) const = 0;
 
-    virtual int mkdir(const char* path, mode_t mode) = 0;
+    virtual int mkdir(const char* path, uint16_t mode) = 0;
 };

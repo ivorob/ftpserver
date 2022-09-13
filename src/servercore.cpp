@@ -2,7 +2,7 @@
 #include "serverconnection.h"
 #include "OSApi.h"
 
-servercore::servercore(uint port, std::string dir, unsigned short commandOffset) 
+servercore::servercore(uint16_t port, std::string dir, unsigned short commandOffset) 
     : dir(dir)
     , commandOffset(commandOffset)
     , shutdown(false)
