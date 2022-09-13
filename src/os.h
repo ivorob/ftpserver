@@ -1,8 +1,8 @@
 #pragma once
 
 #if defined(_WIN32) || defined(_WIN64)
-#include <windows.h>
 #include <winsock2.h>
+#include <windows.h>
 
 using close = closesocket;
 using socklen_t = int;
