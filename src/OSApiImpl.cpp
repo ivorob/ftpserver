@@ -65,9 +65,13 @@ int OSApiImpl::remove(const char* path)
     return ::remove(path);
 }
 
-int OSApiImpl::close(int fd)
+int OSApiImpl::close(SOCKET fd)
 {
+#if defined(_WIN32) || defined(_WIN64)
+    return ::closesocket(fd);
+#else
     return ::close(fd);
+#endif
 }
 
 int OSApiImpl::rmdir(const char* path)

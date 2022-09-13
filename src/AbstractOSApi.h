@@ -20,7 +20,7 @@ public:
     virtual int accept(int s, struct sockaddr* addr, socklen_t* addrlen) = 0;
     virtual int remove(const char *path) = 0;
 
-    virtual int close(int fd) = 0;
+    virtual int close(SOCKET fd) = 0;
     virtual int rmdir(const char* path) = 0;
     virtual int chdir(const char* path) = 0;
     virtual bool canOpenDirectory(const std::string& path) const = 0;

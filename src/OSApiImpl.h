@@ -19,7 +19,7 @@ public:
     int accept(int s, struct sockaddr* addr, socklen_t* addrlen) override;
     int remove(const char* path) override;
 
-    int close(int fd) override;
+    int close(SOCKET fd) override;
     int rmdir(const char* path) override;
     int chdir(const char* path) override;
     bool canOpenDirectory(const std::string& path) const override;

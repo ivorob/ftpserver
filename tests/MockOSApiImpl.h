@@ -17,7 +17,7 @@ public:
     MOCK_METHOD3(accept, int(int, struct sockaddr*, socklen_t*));
     MOCK_METHOD1(remove, int(const char*));
 
-    MOCK_METHOD1(close, int(int));
+    MOCK_METHOD1(close, int(SOCKET));
     MOCK_METHOD1(rmdir, int(const char*));
     MOCK_METHOD1(chdir, int(const char*));
     MOCK_CONST_METHOD1(canOpenDirectory, bool(const std::string&));
