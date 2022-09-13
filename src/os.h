@@ -4,7 +4,7 @@
 #include <winsock2.h>
 #include <windows.h>
 
-using close = closesocket;
+constexpr auto close = closesocket;
 using socklen_t = int;
 #else
 #include <unistd.h>
