@@ -6,7 +6,7 @@
 #include <ws2tcpip.h>
 
 using socklen_t = int;
-using ssize_t = size_t;
+using ssize_t = int;
 #else
 #include <unistd.h>
 #include <arpa/inet.h>
