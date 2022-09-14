@@ -87,7 +87,7 @@ int servercore::handleNewConnection() {
         auto conn = std::make_unique<serverconnection>(
                 std::move(newSocket), this->connId, this->dir, hostId, this->commandOffset); // The connection vector
         this->connections.push_back(std::move(conn));
-    } catch (const std::exception& e) {
+    } catch (...) {
         std::cerr << "Error while accepting client" << std::endl;
         return (EXIT_FAILURE);
     }

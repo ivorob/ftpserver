@@ -53,7 +53,6 @@ bool serverconnection::commandEquals(std::string command, std::string commandToC
 // Command switch for the issued client command, only called when this->command is set to 0
 std::string serverconnection::commandParser(std::string command) {
     this->uploadCommand = false;
-    struct stat Status;
     // Commands can have either 0 or 1 parameters, e.g. 'browse' or 'browse ./'
     std::vector<std::string> commandAndParameter = this->extractParameters(command);
     std::cout << "Connection " << this->connectionId << ": ";

@@ -13,7 +13,7 @@ OSApiImpl::OSApiImpl()
 #endif
 }
 
-int OSApiImpl::socket(int domain, int type, int protocol)
+SOCKET OSApiImpl::socket(int domain, int type, int protocol)
 {
     return ::socket(domain, type, protocol);
 }
@@ -21,7 +21,11 @@ int OSApiImpl::socket(int domain, int type, int protocol)
 int OSApiImpl::setsockopt(int s, int level, int optname, 
     void* optval, socklen_t optlen)
 {
+#if defined(_WIN32) || defined(_WIN64)
+    return ::setsockopt(s, level, optname, reinterpret_cast<const char*>(optval), optlen);
+#else
     return ::setsockopt(s, level, optname, optval, optlen);
+#endif
 }
 
 int OSApiImpl::getsockname(int s, struct sockaddr* name, socklen_t* namelen)
@@ -31,12 +35,20 @@ int OSApiImpl::getsockname(int s, struct sockaddr* name, socklen_t* namelen)
 
 ssize_t OSApiImpl::recv(int s, void* buf, size_t len, int flags)
 {
+#if defined(_WIN32) || defined(_WIN64)
+    return ::recv(s, reinterpret_cast<char*>(buf), len, flags);
+#else
     return ::recv(s, buf, len, flags);
+#endif
 }
 
 ssize_t OSApiImpl::send(int s, const void* msg, size_t len, int flags)
 {
+#if defined(_WIN32) || defined(_WIN64)
+    return ::send(s, reinterpret_cast<const char*>(msg), len, flags);
+#else
     return ::send(s, msg, len, flags);
+#endif
 }
 
 int OSApiImpl::bind(int s, const struct sockaddr* addr, socklen_t addrlen)
@@ -55,7 +67,7 @@ int OSApiImpl::select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* excep
     return ::select(nfds, readfds, writefds, exceptfds, timeout);
 }
 
-int OSApiImpl::accept(int s, struct sockaddr* addr, socklen_t* addrlen)
+SOCKET OSApiImpl::accept(int s, struct sockaddr* addr, socklen_t* addrlen)
 {
     return ::accept(s, addr, addrlen);
 }

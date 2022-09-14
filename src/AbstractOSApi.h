@@ -7,7 +7,7 @@ class AbstractOSApi {
 public:
     virtual ~AbstractOSApi() = default;
 
-    virtual int socket(int domain, int type, int protocol) = 0;
+    virtual SOCKET socket(int domain, int type, int protocol) = 0;
     virtual int setsockopt(int s, int level, int optname, 
         void* optval, socklen_t optlen) = 0;
     virtual int getsockname(int s, struct sockaddr* name, socklen_t* namelen) = 0;
@@ -17,7 +17,7 @@ public:
     virtual int listen(int s, int backlog) = 0;
     virtual int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
         struct timeval* timeout) = 0;
-    virtual int accept(int s, struct sockaddr* addr, socklen_t* addrlen) = 0;
+    virtual SOCKET accept(int s, struct sockaddr* addr, socklen_t* addrlen) = 0;
     virtual int remove(const char *path) = 0;
 
     virtual int close(SOCKET fd) = 0;
