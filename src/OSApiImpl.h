@@ -7,16 +7,16 @@ public:
     OSApiImpl();
 
     SOCKET socket(int domain, int type, int protocol) override;
-    int setsockopt(int s, int level, int optname, 
+    int setsockopt(SOCKET s, int level, int optname, 
         void* optval, socklen_t optlen) override;
-    int getsockname(int s, struct sockaddr* name, socklen_t* namelen) override;
-    ssize_t recv(int s, void* buf, size_t len, int flags) override;
-    ssize_t send(int s, const void* msg, size_t len, int flags) override;
-    int bind(int s, const struct sockaddr* addr, socklen_t addrlen) override;
-    int listen(int s, int backlog) override;
+    int getsockname(SOCKET s, struct sockaddr* name, socklen_t* namelen) override;
+    ssize_t recv(SOCKET s, void* buf, size_t len, int flags) override;
+    ssize_t send(SOCKET s, const void* msg, size_t len, int flags) override;
+    int bind(SOCKET s, const struct sockaddr* addr, socklen_t addrlen) override;
+    int listen(SOCKET s, int backlog) override;
     int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
         struct timeval* timeout) override;
-    SOCKET accept(int s, struct sockaddr* addr, socklen_t* addrlen) override;
+    SOCKET accept(SOCKET s, struct sockaddr* addr, socklen_t* addrlen) override;
     int remove(const char* path) override;
 
     int close(SOCKET fd) override;

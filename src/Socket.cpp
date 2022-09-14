@@ -3,7 +3,7 @@
 #include "Socket.h"
 #include "OSApi.h"
 
-Socket::Socket(int sockfd)
+Socket::Socket(SOCKET sockfd)
     : sockfd(sockfd)
 {
     if (this->sockfd == INVALID_SOCKET) {
