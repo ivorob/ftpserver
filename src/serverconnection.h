@@ -22,7 +22,7 @@ public:
     std::vector<std::string> extractParameters(std::string command);
     ~serverconnection();
     void respondToQuery();
-    int getFD() const;
+    SOCKET getFD() const;
     bool getCloseRequestStatus() const;
     unsigned int getConnectionId() const;
 private:

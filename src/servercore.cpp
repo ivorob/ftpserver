@@ -46,7 +46,7 @@ void servercore::buildSelectList() {
                 return; // Don't increment the iterator when there is nothing to iterate over - avoids crash
             }
         } else {
-            int currentFD = (*iter)->getFD();
+            auto currentFD = (*iter)->getFD();
             if (currentFD != 0) {
                 FD_SET(currentFD, &(this->socks)); // Adds the socket file descriptor to the monitoring for select
                 if (currentFD > this->highSock) {
@@ -125,7 +125,7 @@ int servercore::start() {
         this->buildSelectList(); // Clear out data handled in the previous iteration, clear closed sockets
 
         // Multiplexes between the existing connections regarding to data waiting to be processed on that connection (that's actually what select does)
-        int readsocks = api()->select(this->highSock+1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
+        int readsocks = api()->select(this->highSock + 1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
         if (readsocks < 0) {
             std::cerr << "Error calling select" << std::endl;
             return (EXIT_FAILURE);

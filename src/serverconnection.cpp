@@ -155,7 +155,7 @@ void serverconnection::sendToClient(std::string response) {
 }
 
 // Returns the file descriptor of the current connection
-int serverconnection::getFD() const {
+SOCKET serverconnection::getFD() const {
     return this->currentSocket.native();
 }
 
