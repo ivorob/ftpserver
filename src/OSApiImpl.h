@@ -17,6 +17,7 @@ public:
     int select(int nfds, fd_set* readfds, fd_set* writefds, fd_set* exceptfds,
         struct timeval* timeout) override;
     SOCKET accept(SOCKET s, struct sockaddr* addr, socklen_t* addrlen) override;
+    bool makeNonBlocking(SOCKET s) override;
     int remove(const char* path) override;
 
     int close(SOCKET fd) override;

@@ -72,6 +72,28 @@ SOCKET OSApiImpl::accept(SOCKET s, struct sockaddr* addr, socklen_t* addrlen)
     return ::accept(s, addr, addrlen);
 }
 
+bool OSApiImpl::makeNonBlocking(SOCKET s)
+{
+#if defined(_WIN32) || defined(_WIN64)
+    unsigned long mode = 0;
+    if (ioctlsocket(s, FIONBIO, &mode) != 0) {
+        return false;
+    }
+#else
+    int opts = fcntl(s, F_GETFL, 0);
+    if (opts < 0) {
+        return false;
+    }
+
+    opts = (opts | O_NONBLOCK);
+    if (fcntl(s, F_SETFL, opts) < 0) {
+        return false;
+    }
+#endif
+
+    return true;
+}
+
 int OSApiImpl::remove(const char* path)
 {
     return ::remove(path);

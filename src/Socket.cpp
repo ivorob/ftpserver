@@ -71,6 +71,9 @@ int Socket::makeNonBlocking()
         return -1;
     }
 
+    if (!api()->makeNonBlocking(this->sockfd)) {
+        throw std::runtime_error("Error settings socket to non-blocking");
+    }
 #if defined(_WIN32) || defined(_WIN64)
     unsigned long mode = 0;
     if (ioctlsocket(this->sockfd, FIONBIO, &mode) != 0) {

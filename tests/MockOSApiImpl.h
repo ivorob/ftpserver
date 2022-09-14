@@ -15,6 +15,7 @@ public:
     MOCK_METHOD2(listen, int(SOCKET, int));
     MOCK_METHOD5(select, int(int, fd_set*, fd_set*, fd_set*, struct timeval*));
     MOCK_METHOD3(accept, SOCKET(SOCKET, struct sockaddr*, socklen_t*));
+    MOCK_METHOD1(makeNonBlocking, bool(SOCKET));
     MOCK_METHOD1(remove, int(const char*));
 
     MOCK_METHOD1(close, int(SOCKET));

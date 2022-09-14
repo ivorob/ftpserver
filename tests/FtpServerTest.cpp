@@ -113,6 +113,8 @@ TEST_F(FtpServerTest, error_during_bind_shutdown_server)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, setsockopt)
         .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, makeNonBlocking)
+        .WillRepeatedly(Return(true));
     EXPECT_CALL(*impl, bind)
         .WillRepeatedly(Return(-1));
     EXPECT_CALL(*impl, close)
@@ -144,6 +146,8 @@ TEST_F(FtpServerTest, error_during_listen_shutdown_server)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, socket)
         .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, makeNonBlocking)
+        .WillRepeatedly(Return(true));
     EXPECT_CALL(*impl, setsockopt)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, bind)
@@ -180,6 +184,8 @@ TEST_F(FtpServerTest, server_is_started_successfully)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, socket)
         .WillRepeatedly(Return(0));
+    EXPECT_CALL(*impl, makeNonBlocking)
+        .WillRepeatedly(Return(true));
     EXPECT_CALL(*impl, setsockopt)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, bind)
