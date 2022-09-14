@@ -36,7 +36,7 @@ int OSApiImpl::getsockname(SOCKET s, struct sockaddr* name, socklen_t* namelen)
 ssize_t OSApiImpl::recv(SOCKET s, void* buf, size_t len, int flags)
 {
 #if defined(_WIN32) || defined(_WIN64)
-    return ::recv(s, reinterpret_cast<char*>(buf), len, flags);
+    return ::recv(s, reinterpret_cast<char*>(buf), static_cast<int>(len), flags);
 #else
     return ::recv(s, buf, len, flags);
 #endif
@@ -45,7 +45,7 @@ ssize_t OSApiImpl::recv(SOCKET s, void* buf, size_t len, int flags)
 ssize_t OSApiImpl::send(SOCKET s, const void* msg, size_t len, int flags)
 {
 #if defined(_WIN32) || defined(_WIN64)
-    return ::send(s, reinterpret_cast<const char*>(msg), len, flags);
+    return ::send(s, reinterpret_cast<const char*>(msg), static_cast<int>(len), flags);
 #else
     return ::send(s, msg, len, flags);
 #endif

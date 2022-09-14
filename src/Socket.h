@@ -21,7 +21,7 @@ public:
 
     Socket accept();
 
-    int native() const;
+    SOCKET native() const;
 private:
     void closeSocket();
 private:

@@ -120,7 +120,7 @@ Socket Socket::accept()
                 reinterpret_cast<struct sockaddr*>(&addr), &size));
 }
 
-int Socket::native() const
+SOCKET Socket::native() const
 {
     return this->sockfd;
 }
