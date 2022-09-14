@@ -36,7 +36,7 @@ TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
     auto impl = makeImpl();
     std::string message;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&message](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&message](SOCKET, const void* msg, size_t len, int) -> int {
             if (msg != nullptr && len != 0) {
                 message.assign(reinterpret_cast<const char*>(msg), len);
                 return 0;
@@ -45,7 +45,7 @@ TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
             return -1;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -69,14 +69,14 @@ TEST_F(ServerConnectionTest, send_502_code_for_unimplemented_command)
     auto impl = makeImpl();
 
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "invalid command\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             if (msg == nullptr || len == 0) {
                 return -1;
             }
@@ -87,7 +87,7 @@ TEST_F(ServerConnectionTest, send_502_code_for_unimplemented_command)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -116,14 +116,14 @@ TEST_F(ServerConnectionTest, user_command_is_processed_successfully)
     auto impl = makeImpl();
 
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "USER unknown\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             if (msg == nullptr || len == 0) {
                 return -1;
             }
@@ -134,7 +134,7 @@ TEST_F(ServerConnectionTest, user_command_is_processed_successfully)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -163,14 +163,14 @@ TEST_F(ServerConnectionTest, current_directory_command_is_processed_successfully
     auto impl = makeImpl();
 
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "PWD\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             if (msg == nullptr || len == 0) {
                 return -1;
             }
@@ -181,7 +181,7 @@ TEST_F(ServerConnectionTest, current_directory_command_is_processed_successfully
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -210,14 +210,14 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
     auto impl = makeImpl();
 
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "CWD tests\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             if (msg == nullptr || len == 0) {
                 return -1;
             }
@@ -230,7 +230,7 @@ TEST_F(ServerConnectionTest, change_current_directory_command_is_processed_succe
     EXPECT_CALL(*impl, canOpenDirectory)
         .WillRepeatedly(Return(true));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -262,14 +262,14 @@ TEST_F(ServerConnectionTest, bye_command_is_processed_successfully)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "BYE\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             response.clear();
             if (msg == nullptr || len == 0) {
                 return -1;
@@ -279,7 +279,7 @@ TEST_F(ServerConnectionTest, bye_command_is_processed_successfully)
             return 0;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -314,14 +314,14 @@ TEST_F(ServerConnectionTest, quit_command_is_processed_successfully)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "QUIT\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             response.clear();
             if (msg == nullptr || len == 0) {
                 return -1;
@@ -331,7 +331,7 @@ TEST_F(ServerConnectionTest, quit_command_is_processed_successfully)
             return 0;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -366,14 +366,14 @@ TEST_F(ServerConnectionTest, syst_command_is_processed_successfully)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "SYST\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             response.clear();
             if (msg == nullptr || len == 0) {
                 return -1;
@@ -383,7 +383,7 @@ TEST_F(ServerConnectionTest, syst_command_is_processed_successfully)
             return 0;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -414,14 +414,14 @@ TEST_F(ServerConnectionTest, pasv_command_is_processed_successfully)
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "PASV\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             response.clear();
             if (msg == nullptr || len == 0) {
                 return -1;
@@ -431,7 +431,7 @@ TEST_F(ServerConnectionTest, pasv_command_is_processed_successfully)
             return 0;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) -> int {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) -> int {
             if (name == nullptr || namelen == nullptr || *namelen != sizeof(struct sockaddr_in)) {
                 return -1;
             }
@@ -470,14 +470,14 @@ TEST_F(ServerConnectionTest, pasv_command_with_another_server_is_processed_succe
     EXPECT_CALL(*impl, close)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](int, void* buf, size_t len, int) -> int {
+        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
             std::string command = "PASV\n";
             strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
             return static_cast<int>(command.size());
         });
     std::string response;
     EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](int, const void* msg, size_t len, int) -> int {
+        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
             response.clear();
             if (msg == nullptr || len == 0) {
                 return -1;
@@ -487,7 +487,7 @@ TEST_F(ServerConnectionTest, pasv_command_with_another_server_is_processed_succe
             return 0;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) -> int {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) -> int {
             if (name == nullptr || namelen == nullptr || *namelen != sizeof(struct sockaddr_in)) {
                 return -1;
             }

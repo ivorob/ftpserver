@@ -86,7 +86,7 @@ TEST_F(FtpServerTest, error_during_setsockopt_shutdown_server)
         .Times(1)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -119,7 +119,7 @@ TEST_F(FtpServerTest, error_during_bind_shutdown_server)
         .Times(1)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -154,7 +154,7 @@ TEST_F(FtpServerTest, error_during_listen_shutdown_server)
         .Times(1)
         .WillRepeatedly(Return(0));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
@@ -192,7 +192,7 @@ TEST_F(FtpServerTest, server_is_started_successfully)
     EXPECT_CALL(*impl, select)
         .WillRepeatedly(Return(-1));
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](int, struct sockaddr* name, socklen_t* namelen) {
+        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) {
             return 0;
         });
 
