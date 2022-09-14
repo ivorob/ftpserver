@@ -125,7 +125,8 @@ int servercore::start() {
         this->buildSelectList(); // Clear out data handled in the previous iteration, clear closed sockets
 
         // Multiplexes between the existing connections regarding to data waiting to be processed on that connection (that's actually what select does)
-        int readsocks = api()->select(this->highSock + 1, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
+        int ndfs = static_cast<int>(this->highSock) + 1;
+        int readsocks = api()->select(ndfs, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
         if (readsocks < 0) {
             std::cerr << "Error calling select" << std::endl;
             return (EXIT_FAILURE);
