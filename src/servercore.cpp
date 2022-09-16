@@ -74,7 +74,6 @@ int servercore::handleNewConnection() {
         std::string hostId = "";
         if (this->addr.sin_family == AF_INET) {
             struct sockaddr_in* fd = (struct sockaddr_in*) &(this->addrStorage);
-            port = ntohs(fd->sin_port);
             inet_ntop(AF_INET, &fd->sin_addr, ipstr, sizeof ipstr);
             hostId = (std::string)ipstr;
         }
