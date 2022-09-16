@@ -4,9 +4,9 @@
 
 servercore::servercore(uint16_t port, std::string dir, unsigned short commandOffset) 
     : dir(dir)
-    , commandOffset(commandOffset)
+    , connId(0)
     , shutdown(false)
-    , connId(0) {
+    , commandOffset(commandOffset) {
 
     if (api()->chdir(dir.c_str())) {
         std::cerr << "Directory could not be changed to '" << dir << "'!" << std::endl;

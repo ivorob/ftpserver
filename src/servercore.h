@@ -23,7 +23,6 @@ private:
 private:
     unsigned int maxConnectionsInQuery; // number of connections in query
     Socket listenSocket;
-    int sflags; // Socket fd flags
     std::list<std::unique_ptr<serverconnection>> connections; // Manage the connected sockets / connections in a list with an iterator
     SOCKET highSock; // Highest #'d file descriptor, needed for select()
     fd_set socks; // set of socket file descriptors we want to wake up for, using select()
