@@ -69,7 +69,6 @@ int servercore::handleNewConnection() {
 
         // Get the client IP address
         char ipstr[INET6_ADDRSTRLEN];
-        int port;
         this->addrLength = sizeof this->addrStorage;
         getpeername(newSocket.native(), (struct sockaddr*) &this->addrStorage, &(this->addrLength));
         std::string hostId = "";

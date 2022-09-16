@@ -175,7 +175,7 @@ bool fileoperator::createFile(std::string &fileName, bool strict) {
         std::ofstream fileout;
         fileout.open(this->getCurrentWorkingDir().append(fileName).c_str(), std::ios::out|std::ios::binary|std::ios::app);
         fileout.close();
-    } catch (std::exception e) {
+    } catch (const std::exception& e) {
         std::cerr << e.what() << std::endl;
         return (EXIT_FAILURE);
     }

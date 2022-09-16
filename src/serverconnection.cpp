@@ -11,8 +11,8 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
     , connectionId(connId)
     , dir(std::move(defaultDir))
     , hostAddress(std::move(hostId))
-    , commandOffset(commandOffset)
     , closureRequested(false)
+    , commandOffset(commandOffset)
     , uploadCommand(false)
     , downloadCommand(false)
     , receivedPart(0) {
