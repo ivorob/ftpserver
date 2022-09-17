@@ -8,14 +8,11 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
     : fo(std::make_shared<fileoperator>(defaultDir))
     , currentSocket(std::move(currentSocket))
     , ftpCommandFactory(makeContext())
+    , closureRequested(false)
     , connectionId(connId)
     , dir(std::move(defaultDir))
     , hostAddress(std::move(hostId))
-    , closureRequested(false)
-    , commandOffset(commandOffset)
-    , uploadCommand(false)
-    , downloadCommand(false)
-    , receivedPart(0) {
+    , commandOffset(commandOffset) {
 
     // Send hello
     sendToClient("220 FTP server ready.\n");
@@ -52,7 +49,6 @@ bool serverconnection::commandEquals(std::string command, std::string commandToC
 
 // Command switch for the issued client command, only called when this->command is set to 0
 std::string serverconnection::commandParser(std::string command) {
-    this->uploadCommand = false;
     // Commands can have either 0 or 1 parameters, e.g. 'browse' or 'browse ./'
     std::vector<std::string> commandAndParameter = this->extractParameters(command);
     std::cout << "Connection " << this->connectionId << ": ";
@@ -106,22 +102,11 @@ void serverconnection::respondToQuery() {
     // In non-blocking mode, bytes <= 0 does not mean a connection closure!
     if (bytes > 0) {
         std::string clientCommand = std::string(buffer, bytes);
-        if (this->uploadCommand) { // (Previous) upload command
-            /// Previous (upload) command continuation, store incoming data to the file
-            std::cout << "Part " << ++(this->receivedPart) << ": ";
-            this->fo->writeFileBlock(clientCommand);
-        } else {
-            // If not upload command issued, parse the incoming data for command and parameters
-            std::string res = this->commandParser(clientCommand);
-            this->sendToClient(res); // Send response to client if no binary file
-        }
+
+        std::string res = this->commandParser(clientCommand);
+        this->sendToClient(res); // Send response to client if no binary file
     } else { // no bytes incoming over this connection
-        if (this->uploadCommand) { // If upload command was issued previously and no data is left to receive, close the file and connection
-            this->uploadCommand = false;
-            this->downloadCommand = false;
-            this->closureRequested = true;
-            this->receivedPart = 0;
-        }
+        this->closureRequested = true;
     }
 }
 

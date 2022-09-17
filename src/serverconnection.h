@@ -46,8 +46,5 @@ private:
     unsigned int connectionId;
     std::string dir;
     std::string hostAddress;
-    bool uploadCommand;
-    bool downloadCommand;
     unsigned short commandOffset;
-    unsigned long receivedPart;
 };
