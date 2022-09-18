@@ -50,6 +50,7 @@ Available commands in the program that the client can issue and the running ftps
 
 ## TODO
 
+* Implement logic of data connection
 * Align to standard FTP *SERVER* commands, see http://www.nsftools.com/tips/RawFTP.htm and https://www.rfc-editor.org/rfc/rfc959
 * Refactor the code to align to new C++ versions and standards
 * Refactor the code to make standard ftp clients work
