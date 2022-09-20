@@ -11,6 +11,7 @@
 #include "Socket.h"
 #include "FTPCommandFactory.h"
 #include "FTPContext.h"
+#include "DataConnection.h"
 
 // Separator for commands
 #define SEPARATOR " "
@@ -47,4 +48,5 @@ private:
     std::string dir;
     std::string hostAddress;
     unsigned short commandOffset;
+    std::unique_ptr<DataConnection> dataConnection;
 };

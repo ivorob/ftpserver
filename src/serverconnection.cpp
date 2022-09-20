@@ -32,7 +32,11 @@ void serverconnection::shutdown() {
 }
 
 struct sockaddr_in serverconnection::obtainDataConnection() {
-    return currentSocket.getAddress();
+    if (!dataConnection) {
+        dataConnection = std::make_unique<DataConnection>(currentSocket.getAddress());
+    }
+
+    return dataConnection->getAddress();
 }
 
 // Destructor, clean up all the mess

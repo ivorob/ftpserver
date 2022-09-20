@@ -14,7 +14,7 @@ public:
 
     int allowReuse();
     int makeNonBlocking();
-    void bind(struct sockaddr_in& addr);
+    void bind(const struct sockaddr_in& addr);
     void listen(int backlog);
 
     struct sockaddr_in getAddress() const;

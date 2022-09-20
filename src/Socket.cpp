@@ -78,12 +78,19 @@ int Socket::makeNonBlocking()
     return 0;
 }
 
-void Socket::bind(struct sockaddr_in& addr)
+void Socket::bind(const struct sockaddr_in& addr)
 {
     if (api()->bind(this->sockfd, 
-            reinterpret_cast<struct sockaddr*>(&addr),
+            reinterpret_cast<const struct sockaddr*>(&addr),
             sizeof(struct sockaddr_in)) == -1) {
         throw std::runtime_error("bind() failed (do you have the apropriate rights? is the port unused?)");
+    }
+
+    socklen_t namelen = sizeof(address);
+    if (api()->getsockname(this->sockfd, 
+            reinterpret_cast<struct sockaddr*>(&address), 
+            &namelen) == -1) {
+        throw std::runtime_error("Cannot get socket address");
     }
 }
 

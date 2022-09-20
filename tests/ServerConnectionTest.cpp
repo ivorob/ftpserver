@@ -25,6 +25,19 @@ std::shared_ptr<MockOSApiImpl> makeImpl() {
     return impl;
 }
 
+template <uint32_t address, uint16_t port>
+int makeAddress(SOCKET, struct sockaddr* name, socklen_t* namelen) {
+    if (name == nullptr || namelen == nullptr || *namelen != sizeof(struct sockaddr_in)) {
+        return -1;
+    }
+
+    struct sockaddr_in* addr = reinterpret_cast<struct sockaddr_in*>(name);
+    addr->sin_family = AF_INET;
+    addr->sin_addr.s_addr = address;
+    addr->sin_port = htons(port);
+    return 0;
+}
+
 }
 
 TEST_F(ServerConnectionTest, create_regular_server_connection_is_succeeded)
@@ -431,17 +444,15 @@ TEST_F(ServerConnectionTest, pasv_command_is_processed_successfully)
             return 0;
         });
     EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) -> int {
-            if (name == nullptr || namelen == nullptr || *namelen != sizeof(struct sockaddr_in)) {
-                return -1;
-            }
-
-            struct sockaddr_in* addr = reinterpret_cast<struct sockaddr_in*>(name);
-            addr->sin_family = AF_INET;
-            addr->sin_addr.s_addr = 0x0100007f;
-            addr->sin_port = htons(4242);
-            return 0;
+        .WillOnce(makeAddress<0x0100007f, 4242>)
+        .WillOnce(makeAddress<0x0100007f, 4242>)
+        .WillOnce(makeAddress<0x0100007f, 60000>);
+    EXPECT_CALL(*impl, socket)
+        .WillRepeatedly([](int, int, int) -> SOCKET {
+            return static_cast<SOCKET>(1);
         });
+    EXPECT_CALL(*impl, bind)
+        .WillRepeatedly(Return(0));
 
     serverconnection serverConnection(Socket(1), 1, "./", "127.0.0.1");
 
@@ -457,61 +468,5 @@ TEST_F(ServerConnectionTest, pasv_command_is_processed_successfully)
         response);
     ASSERT_EQ(
         "Connection 1: Initiate data connection on 127.0.0.1:60000\n",
-        out.str());
-}
-
-TEST_F(ServerConnectionTest, pasv_command_with_another_server_is_processed_successfully)
-{
-    // Arrange
-    using ::testing::Return;
-
-    auto impl = makeImpl();
-
-    EXPECT_CALL(*impl, close)
-        .WillRepeatedly(Return(0));
-    EXPECT_CALL(*impl, recv)
-        .WillRepeatedly([](SOCKET, void* buf, size_t len, int) -> int {
-            std::string command = "PASV\n";
-            strncpy(reinterpret_cast<char*>(buf), command.c_str(), len);
-            return static_cast<int>(command.size());
-        });
-    std::string response;
-    EXPECT_CALL(*impl, send)
-        .WillRepeatedly([&response](SOCKET, const void* msg, size_t len, int) -> int {
-            response.clear();
-            if (msg == nullptr || len == 0) {
-                return -1;
-            }
-
-            response.assign(reinterpret_cast<const char*>(msg), len);
-            return 0;
-        });
-    EXPECT_CALL(*impl, getsockname)
-        .WillRepeatedly([](SOCKET, struct sockaddr* name, socklen_t* namelen) -> int {
-            if (name == nullptr || namelen == nullptr || *namelen != sizeof(struct sockaddr_in)) {
-                return -1;
-            }
-
-            struct sockaddr_in* addr = reinterpret_cast<struct sockaddr_in*>(name);
-            addr->sin_family = AF_INET;
-            addr->sin_addr.s_addr = 0x01000a0a;
-            addr->sin_port = htons(4242);
-            return 0;
-        });
-
-    serverconnection serverConnection(Socket(1), 1, "./", "10.10.0.1");
-
-    std::ostringstream out;
-    ScopedStreamRedirector streamRedirector(std::cout, out);
-
-    // Act
-    serverConnection.respondToQuery();
-
-    // Assert
-    ASSERT_EQ(
-        "227 Entering Passive Mode (10,10,0,1,234,96)\n",
-        response);
-    ASSERT_EQ(
-        "Connection 1: Initiate data connection on 10.10.0.1:60000\n",
         out.str());
 }

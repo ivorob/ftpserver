@@ -23,6 +23,7 @@ SET (SOURCES
         ${MAIN_SRC_DIR}/Socket.cpp
         ${MAIN_SRC_DIR}/FTPCommandFactory.cpp
         ${MAIN_SRC_DIR}/OSUtils.cpp
+        ${MAIN_SRC_DIR}/DataConnection.cpp
         ${MAIN_SRC_DIR}/FTPCommand.cpp
         ${MAIN_SRC_DIR}/ftpcommands/DefaultCommand.cpp
         ${MAIN_SRC_DIR}/ftpcommands/UserCommand.cpp
@@ -44,6 +45,7 @@ SET (HEADERS
         ${MAIN_INCLUDE_DIR}/Socket.h
         ${MAIN_INCLUDE_DIR}/FTPCommandFactory.h
         ${MAIN_INCLUDE_DIR}/OSUtils.h
+        ${MAIN_INCLUDE_DIR}/DataConnection.h
         ${MAIN_INCLUDE_DIR}/FTPCommand.h
         ${MAIN_INCLUDE_DIR}/FTPContext.h
         ${MAIN_INCLUDE_DIR}/ftpcommands/Commands.h
