@@ -16,6 +16,7 @@ SET (SOURCES
         ${SRC_DIR}/DeleteFileTest.cpp
         ${SRC_DIR}/FakeOSApi.cpp
         ${SRC_DIR}/ServerConnectionTest.cpp
+        ${SRC_DIR}/LoggerTest.cpp
         # main sources
         ${MAIN_SRC_DIR}/servercore.cpp
         ${MAIN_SRC_DIR}/serverconnection.cpp
@@ -24,6 +25,7 @@ SET (SOURCES
         ${MAIN_SRC_DIR}/FTPCommandFactory.cpp
         ${MAIN_SRC_DIR}/OSUtils.cpp
         ${MAIN_SRC_DIR}/DataConnection.cpp
+        ${MAIN_SRC_DIR}/Logger.cpp
         ${MAIN_SRC_DIR}/FTPCommand.cpp
         ${MAIN_SRC_DIR}/ftpcommands/DefaultCommand.cpp
         ${MAIN_SRC_DIR}/ftpcommands/UserCommand.cpp
@@ -46,6 +48,7 @@ SET (HEADERS
         ${MAIN_INCLUDE_DIR}/FTPCommandFactory.h
         ${MAIN_INCLUDE_DIR}/OSUtils.h
         ${MAIN_INCLUDE_DIR}/DataConnection.h
+        ${MAIN_INCLUDE_DIR}/Logger.h
         ${MAIN_INCLUDE_DIR}/FTPCommand.h
         ${MAIN_INCLUDE_DIR}/FTPContext.h
         ${MAIN_INCLUDE_DIR}/ftpcommands/Commands.h
