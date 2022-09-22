@@ -1,13 +1,14 @@
 #include <iostream>
 
 #include "CurrentDirectoryCommand.h"
+#include "Logger.h"
 
 FTP::CurrentDirectoryCommand::CurrentDirectoryCommand(Context context)
     : Command(std::move(context)) {
 }
 
 std::string FTP::CurrentDirectoryCommand::execute(std::vector<std::string> arguments) {
-    std::cout << "Working dir requested" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Working dir requested" << std::endl;
 
     auto fileOperator = getContext().fileOperator.lock();
     if (fileOperator) {

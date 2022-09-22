@@ -2,6 +2,7 @@
 
 #include "serverconnection.h"
 #include "OSApi.h"
+#include "Logger.h"
 
 // Constructor
 serverconnection::serverconnection(Socket currentSocket, unsigned int connId, std::string defaultDir, std::string hostId, unsigned short commandOffset) 
@@ -16,7 +17,7 @@ serverconnection::serverconnection(Socket currentSocket, unsigned int connId, st
 
     // Send hello
     sendToClient("220 FTP server ready.\n");
-    std::cout << "Connection to client '" << this->hostAddress << "' established" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Connection to client '" << this->hostAddress << "' established" << std::endl;
 }
 
 FTP::Context serverconnection::makeContext() {
@@ -41,7 +42,7 @@ struct sockaddr_in serverconnection::obtainDataConnection() {
 
 // Destructor, clean up all the mess
 serverconnection::~serverconnection() {
-    std::cout << "Connection terminated to client (connection id " << this->connectionId << ")" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Connection terminated to client (connection id " << this->connectionId << ")" << std::endl;
 }
 
 // Check for matching (commands/strings) with compare method
@@ -55,7 +56,7 @@ bool serverconnection::commandEquals(std::string command, std::string commandToC
 std::string serverconnection::commandParser(std::string command) {
     // Commands can have either 0 or 1 parameters, e.g. 'browse' or 'browse ./'
     std::vector<std::string> commandAndParameter = this->extractParameters(command);
-    std::cout << "Connection " << this->connectionId << ": ";
+    LOG(logger, Logger::LogLevel::Info) << "Connection " << this->connectionId << ": ";
 
     if (commandAndParameter.empty()) {
         return "\n";

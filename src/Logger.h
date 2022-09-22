@@ -25,3 +25,5 @@ private:
 };
 
 Logger::LogObject& LOG(Logger& logger, Logger::LogLevel logLevel);
+
+static Logger logger;

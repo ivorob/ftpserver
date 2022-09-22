@@ -1,6 +1,7 @@
 #include "servercore.h"
 #include "serverconnection.h"
 #include "OSApi.h"
+#include "Logger.h"
 
 servercore::servercore(uint16_t port, std::string dir, unsigned short commandOffset) 
     : dir(dir)
@@ -9,7 +10,7 @@ servercore::servercore(uint16_t port, std::string dir, unsigned short commandOff
     , commandOffset(commandOffset) {
 
     if (api()->chdir(dir.c_str())) {
-        std::cerr << "Directory could not be changed to '" << dir << "'!" << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << "Directory could not be changed to '" << dir << "'!" << std::endl;
     }
 
     this->initSockets(port);
@@ -18,7 +19,7 @@ servercore::servercore(uint16_t port, std::string dir, unsigned short commandOff
 
 // Free up used memory by cleaning up all the object variables;
 servercore::~servercore() {
-    std::cout << "Server shutdown" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Server shutdown" << std::endl;
     shutdownServer();
 }
 
@@ -40,7 +41,7 @@ void servercore::buildSelectList() {
     auto iter = this->connections.begin();
     while (iter != this->connections.end()) {
         if ((*iter)->getCloseRequestStatus()) { // This connection was closed, flag is set -> remove its corresponding object and free the memory
-            std::cout << "Connection with Id " << (*iter)->getConnectionId() << " closed! " << std::endl;
+            LOG(logger, Logger::LogLevel::Info) << "Connection with Id " << (*iter)->getConnectionId() << " closed! " << std::endl;
             this->connections.erase(iter); // Delete it from our vector
             if (this->connections.empty() || (iter == this->connections.end())) {
                 return; // Don't increment the iterator when there is nothing to iterate over - avoids crash
@@ -78,7 +79,7 @@ int servercore::handleNewConnection() {
             hostId = (std::string)ipstr;
         }
 
-        std::cout << "Connection accepted: FD=" << newSocket.native()
+        LOG(logger, Logger::LogLevel::Info) << "Connection accepted: FD=" << newSocket.native()
             << " - Slot=" << (this->connections.size() + 1) 
             << (++this->connId) << std::endl;
         // The new connection (object)
@@ -86,7 +87,7 @@ int servercore::handleNewConnection() {
                 std::move(newSocket), this->connId, this->dir, hostId, this->commandOffset); // The connection vector
         this->connections.push_back(std::move(conn));
     } catch (...) {
-        std::cerr << "Error while accepting client" << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << "Error while accepting client" << std::endl;
         return (EXIT_FAILURE);
     }
 
@@ -126,7 +127,7 @@ int servercore::start() {
         int ndfs = static_cast<int>(this->highSock) + 1;
         int readsocks = api()->select(ndfs, &(this->socks), (fd_set*)0, (fd_set*)0, &timeout);
         if (readsocks < 0) {
-            std::cerr << "Error calling select" << std::endl;
+            LOG(logger, Logger::LogLevel::Error) << "Error calling select" << std::endl;
             return (EXIT_FAILURE);
         }
 
@@ -154,11 +155,11 @@ void servercore::initSockets(int port) {
         this->maxConnectionsInQuery = 50;
         this->listenSocket.listen(this->maxConnectionsInQuery);
     } catch (const std::runtime_error& e) {
-        std::cerr << e.what() << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << e.what() << std::endl;
         shutdownServer();
         return;
     }
 
     this->highSock = this->listenSocket.native(); // This is the first (and the main listening) socket
-    std::cout << "Server started and listening at port " << port << ", default server directory '" << this->dir << "'" << ((this->commandOffset == 3) ? ", for use with telnet" : "")  << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Server started and listening at port " << port << ", default server directory '" << this->dir << "'" << ((this->commandOffset == 3) ? ", for use with telnet" : "")  << std::endl;
 }

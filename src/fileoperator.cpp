@@ -1,5 +1,6 @@
 #include "fileoperator.h"
 #include "OSApi.h"
+#include "Logger.h"
 
 // Constructor, gets the current server root dir as a parameter
 fileoperator::fileoperator(std::string dir) {
@@ -21,7 +22,7 @@ bool fileoperator::changeDir(std::string newPath, bool strict) {
     if ( (newPath.compare("..") == 0) || (newPath.compare("../") == 0) ) {
         // If we are already in the server root dir, prohibit the change to a higher directory
         if (this->completePath.size() <= 1) {
-            std::cerr << "Error: Change beyond server root requested (prohibited)!" << std::endl;
+            LOG(logger, Logger::LogLevel::Error) << "Error: Change beyond server root requested (prohibited)!" << std::endl;
             return (EXIT_FAILURE); // 1
         } else { // change is permitted, now do it!
             this->completePath.pop_back(); // Remove the last dir we were in and return to the lower one
@@ -30,7 +31,7 @@ bool fileoperator::changeDir(std::string newPath, bool strict) {
     }
     // The change is the local directory !?
     if ( (newPath.compare(".") == 0) || (newPath.compare("./") == 0)) {
-        std::cout << "Change to same dir requested (nothing done)!" << std::endl;
+        LOG(logger, Logger::LogLevel::Info) << "Change to same dir requested (nothing done)!" << std::endl;
         return (EXIT_SUCCESS); // 0 (?)
     }
 
@@ -81,7 +82,7 @@ bool fileoperator::createDirectory(std::string &dirName, bool strict) {
     // Prohibit deletion of dir ../ beyond server root
     if ((dirName.compare("../") == 0) && (this->completePath.size() < 2)) {
         dirName = "./";
-        std::cerr << "Error: Deletion of dir beyond server root requested (prohibited)!" << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << "Error: Deletion of dir beyond server root requested (prohibited)!" << std::endl;
         return true;
     }
 
@@ -100,7 +101,7 @@ std::unique_ptr<char[]> fileoperator::readFileBlock(std::ifstream& input, unsign
     std::ifstream::pos_type size = input.tellg();
     sizeInBytes = (unsigned long)size;
     if (size == 0) {
-        std::cout << "Try to read empty file!" << std::endl;
+        LOG(logger, Logger::LogLevel::Info) << "Try to read empty file!" << std::endl;
         return {};
     }
 
@@ -110,7 +111,7 @@ std::unique_ptr<char[]> fileoperator::readFileBlock(std::ifstream& input, unsign
     // read data as a block
     input.read(memblock.get(), size);
 
-    std::cout << "Reading " << size << " Bytes" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Reading " << size << " Bytes" << std::endl;
     return memblock;
 }
 
@@ -120,7 +121,7 @@ std::ifstream fileoperator::readFile(std::string fileName) {
 
     std::ifstream input(fileName, std::ios::in | std::ios::binary); // modes for binary file  |std::ios::ate
     if (input.fail()) {
-        std::cout << "Reading file '" << fileName << "' failed!" << std::endl; //  strerror(errno) <<
+        LOG(logger, Logger::LogLevel::Info) << "Reading file '" << fileName << "' failed!" << std::endl; //  strerror(errno) <<
         return input;
     }
 
@@ -128,7 +129,7 @@ std::ifstream fileoperator::readFile(std::string fileName) {
         return input;
     }
 
-    std::cerr << "Unable to open file '" << fileName << " '" << std::endl; // << strerror(errno)
+    LOG(logger, Logger::LogLevel::Error) << "Unable to open file '" << fileName << " '" << std::endl; // << strerror(errno)
     return input;
 }
 
@@ -137,21 +138,21 @@ int fileoperator::beginWriteFile(std::string fileName) {
 
     this->currentOpenFile.open(fileName.c_str(), std::ios::out|std::ios::binary|std::ios::app); // output file
     if(!this->currentOpenFile) {
-        std::cerr << "Cannot open output file '" << fileName << "'" << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << "Cannot open output file '" << fileName << "'" << std::endl;
         return (EXIT_FAILURE);
     }
-    std::cout << "Beginning writing to file '" << fileName << "'" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Beginning writing to file '" << fileName << "'" << std::endl;
     return (EXIT_SUCCESS);
 }
 
 /// @WARNING, @KLUDGE: Concurrent file access not catched
 int fileoperator::writeFileBlock(std::string content) {
     if (!this->currentOpenFile.is_open()) {
-        std::cerr << "Cannot write to output file" << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << "Cannot write to output file" << std::endl;
         return (EXIT_FAILURE);
     }
 
-    std::cout << "Appending to file" << std::endl;
+    LOG(logger, Logger::LogLevel::Info) << "Appending to file" << std::endl;
     (this->currentOpenFile) << content;
     return (EXIT_SUCCESS);
 }
@@ -159,7 +160,7 @@ int fileoperator::writeFileBlock(std::string content) {
 // File is closed when disconnecting
 void fileoperator::closeWriteFile() {
     if (this->currentOpenFile.is_open()) {
-        std::cout << "Closing open file" << std::endl;
+        LOG(logger, Logger::LogLevel::Info) << "Closing open file" << std::endl;
         this->currentOpenFile.close();
     }
 }
@@ -176,7 +177,7 @@ bool fileoperator::createFile(std::string &fileName, bool strict) {
         fileout.open(this->getCurrentWorkingDir().append(fileName).c_str(), std::ios::out|std::ios::binary|std::ios::app);
         fileout.close();
     } catch (const std::exception& e) {
-        std::cerr << e.what() << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << e.what() << std::endl;
         return (EXIT_FAILURE);
     }
 
@@ -195,10 +196,10 @@ bool fileoperator::deleteFile(std::string fileName, bool strict) {
     }
 
     if (api()->remove(this->getCurrentWorkingDir().append(fileName).c_str()) != 0 ) {
-        std::cerr << "Error deleting file '" << fileName << "'" << std::endl;
+        LOG(logger, Logger::LogLevel::Error) << "Error deleting file '" << fileName << "'" << std::endl;
         return (EXIT_FAILURE);
     } else {
-        std::cout << "File '" << fileName << "' deleted" << std::endl;
+        LOG(logger, Logger::LogLevel::Info) << "File '" << fileName << "' deleted" << std::endl;
         this->deletedFiles.push_back(fileName);
         return (EXIT_SUCCESS);
     }

@@ -8,6 +8,7 @@
 #include <algorithm>
 
 #include "PassiveModeCommand.h"
+#include "Logger.h"
 
 FTP::PassiveModeCommand::PassiveModeCommand(Context context)
     : Command(std::move(context)) {
@@ -18,7 +19,7 @@ std::string FTP::PassiveModeCommand::execute(std::vector<std::string>) {
     uint16_t port = htons(address.sin_port);
 
     char buffer[128];
-    std::cout << "Initiate data connection on " 
+    LOG(logger, Logger::LogLevel::Info) << "Initiate data connection on " 
               << inet_ntop(AF_INET, &address.sin_addr.s_addr, buffer, sizeof(buffer))
               << ":" << port << std::endl;
 

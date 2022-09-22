@@ -5,6 +5,7 @@
 
 #include "servercore.h"
 #include "OSApi.h"
+#include "Logger.h"
 
 namespace fs = std::filesystem;
 
@@ -18,7 +19,7 @@ int main(int argc, char** argv) {
     unsigned int port = 4242; // Port to listen on (>1024 for no root permissions required)
     std::string dir = "./"; // Default dir
     if (argc < 2) {
-        std::cout << "Usage: ftpserver <dir> <port> [telnetmode=no], using default dir '" << dir << "' , port " << port << std::endl;
+        LOG(logger, Logger::LogLevel::Info) << "Usage: ftpserver <dir> <port> [telnetmode=no], using default dir '" << dir << "' , port " << port << std::endl;
     } else {
         switch (argc) {
             case 4:
@@ -33,7 +34,7 @@ int main(int argc, char** argv) {
                     dir = argv[1]; // set default server directory
                     fs::current_path(dir);
                 } else {
-                    std::cout << "Invalid path specified ('" << argv[1] << "'), falling back to '" << dir << "'" << std::endl;
+                    LOG(logger, Logger::LogLevel::Info) << "Invalid path specified ('" << argv[1] << "'), falling back to '" << dir << "'" << std::endl;
                 }
                 break;
         }
