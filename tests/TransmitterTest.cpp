@@ -41,7 +41,7 @@ TEST_F(TransmitterTest, send_data_is_succeeded) {
             }
 
             data.assign(reinterpret_cast<const char*>(msg), len);
-            return data.size();
+            return static_cast<ssize_t>(data.size());
         });
 
     Socket dataSocket(1);
