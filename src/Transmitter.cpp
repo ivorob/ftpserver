@@ -21,5 +21,5 @@ ssize_t Transmitter::transmit() {
         position += static_cast<size_t>(bytesSent);
     }
 
-    return position;
+    return static_cast<ssize_t>(position);
 }
