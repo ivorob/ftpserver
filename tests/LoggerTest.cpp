@@ -2,6 +2,16 @@
 
 #include "Logger.h"
 #include "ScopedStreamRedirector.h"
+#include "StringLogHandler.h"
+
+namespace {
+
+std::shared_ptr<LogHandler> makeLogHandler(std::ostream& output = std::cout) {
+    std::shared_ptr<LogHandler> logHandler(new StringLogHandler(output));
+    return logHandler;
+}
+
+}
 
 TEST(LoggerTest, log_level_by_default_isnot_set) {
     // Arrange
@@ -62,4 +72,32 @@ TEST(LoggerTest, simplify_logging) {
 
     // Assert
     ASSERT_EQ(output.str(), "New message to error log!");
+}
+
+TEST(LoggerTest, set_new_log_level_handler_is_succeeded) {
+    // Arrange
+    Logger logger(Logger::LogLevel::Error);
+
+    // Act
+    std::stringstream output;
+    auto stringLogHandler = makeLogHandler(output);
+    logger.setHandler(Logger::LogLevel::Error, stringLogHandler);
+
+    // Assert
+    ASSERT_EQ(&output, &logger.makeLogObject(Logger::LogLevel::Error));
+}
+
+TEST(LoggerTest, write_log_using_new_handler_is_succeeded) {
+    // Arrange
+    Logger logger(Logger::LogLevel::Error);
+
+    std::stringstream output;
+    auto stringLogHandler = makeLogHandler(output);
+    logger.setHandler(Logger::LogLevel::Fatal, stringLogHandler);
+
+    // Act
+    LOG(logger, Logger::LogLevel::Fatal) << "New log to new stream";
+
+    // Assert
+    ASSERT_EQ("New log to new stream", output.str());
 }
