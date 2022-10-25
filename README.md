@@ -50,7 +50,6 @@ Available commands in the program that the client can issue and the running ftps
 
 ## TODO
 
-* Filter log by log level;
 * Add ability to keep the same logs in different handlers;
 * Implement logic of data connection;
 * Align to standard FTP *SERVER* commands, see http://www.nsftools.com/tips/RawFTP.htm and https://www.rfc-editor.org/rfc/rfc959;

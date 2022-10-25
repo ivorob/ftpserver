@@ -27,6 +27,7 @@ SET (SOURCES
         ${MAIN_SRC_DIR}/OSUtils.cpp
         ${MAIN_SRC_DIR}/DataConnection.cpp
         ${MAIN_SRC_DIR}/Logger.cpp
+        ${MAIN_SRC_DIR}/NullLogHandler.cpp
         ${MAIN_SRC_DIR}/StringLogHandler.cpp
         ${MAIN_SRC_DIR}/Transmitter.cpp
         ${MAIN_SRC_DIR}/FTPCommand.cpp
@@ -52,6 +53,7 @@ SET (HEADERS
         ${MAIN_INCLUDE_DIR}/OSUtils.h
         ${MAIN_INCLUDE_DIR}/DataConnection.h
         ${MAIN_INCLUDE_DIR}/Logger.h
+        ${MAIN_INCLUDE_DIR}/NullLogHandler.h
         ${MAIN_INCLUDE_DIR}/Transmitter.h
         ${MAIN_INCLUDE_DIR}/StringLogHandler.h
         ${MAIN_INCLUDE_DIR}/FTPCommand.h

@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Logger.h"
 
+Logger logger(Logger::LogLevel::Debug);
+
 Logger::Logger(LogLevel logLevel)
     : logLevel(logLevel) {
 }
@@ -14,15 +16,19 @@ void Logger::setLogLevel(LogLevel logLevel) {
 }
 
 std::ostream& Logger::makeLogObject(LogLevel logLevel) {
-    auto it = this->handlers.find(logLevel);
-    if (it != std::cend(this->handlers)) {
-        auto handler = it->second;
-        if (handler) {
-            return handler->getStream();
+    if (logLevel <= getLogLevel()) {
+        auto it = this->handlers.find(logLevel);
+        if (it != std::cend(this->handlers)) {
+            auto handler = it->second;
+            if (handler) {
+                return handler->getStream();
+            }
         }
+
+        return standardLogLevelHandler(logLevel);
     }
 
-    return standardLogLevelHandler(logLevel);
+    return nullLogHandler.getStream();
 }
 
 Logger::LogObject& Logger::standardLogLevelHandler(LogLevel logLevel) const {

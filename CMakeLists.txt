@@ -30,6 +30,7 @@ SET (SOURCES
         ${SRC_DIR}/OSUtils.cpp
         ${SRC_DIR}/DataConnection.cpp
         ${SRC_DIR}/Logger.cpp
+        ${SRC_DIR}/NullLogHandler.cpp
         # commands
         ${SRC_DIR}/FTPCommand.cpp
         ${SRC_DIR}/ftpcommands/DefaultCommand.cpp
@@ -53,6 +54,7 @@ SET (HEADERS
         ${INCLUDE_DIR}/OSUtils.h
         ${INCLUDE_DIR}/DataConnection.h
         ${INCLUDE_DIR}/Logger.h
+        ${INCLUDE_DIR}/NullLogHandler.h
         # commands
         ${INCLUDE_DIR}/FTPContext.h
         ${INCLUDE_DIR}/FTPCommand.h

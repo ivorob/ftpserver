@@ -5,6 +5,7 @@
 #include <unordered_map>
 
 #include "LogHandler.h"
+#include "NullLogHandler.h"
 
 class Logger {
 public:
@@ -33,8 +34,9 @@ private:
 private:
     LogLevel logLevel;
     std::unordered_map<LogLevel, LogHandlerHolder> handlers;
+    NullLogHandler nullLogHandler;
 };
 
 Logger::LogObject& LOG(Logger& logger, Logger::LogLevel logLevel);
 
-static Logger logger;
+extern Logger logger;
